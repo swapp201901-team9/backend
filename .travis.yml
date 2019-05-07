@@ -29,7 +29,7 @@ matrix:
       - sudo pip3 install -U setuptools
       - python3 -V
       - pip3 -V 
-      - cd ./backend/
+      #- cd ./backend/
     install: 
       - sudo pip3 install -r requirements.txt
     script:
