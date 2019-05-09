@@ -15,3 +15,7 @@ class IsAuthenticatedOrGETOnly(permissions.BasePermission):
 class IsAuthenticatedOrNothing(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user.is_authenticated
+
+class NoAuthenticationRequired(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return True
