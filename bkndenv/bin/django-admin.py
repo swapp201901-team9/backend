@@ -1,4 +1,4 @@
-#!/home/hyunsama/Workspace/swpp/full-stack-web-development/backend/bkndenv/bin/python3
+#!/home/kernellab/Workspace/swpp/backend/bkndenv/bin/python
 from django.core import management
 
 if __name__ == "__main__":
