@@ -237,7 +237,28 @@ def group_list_all(request):
         except Group.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         group_serializer = GroupSerializer(groups, many=True)
-        context = {
-            'groupList': group_serializer.data,
-        }
         return Response(group_serializer.data)
+
+@csrf_exempt
+@api_view(['GET', 'POST'])
+@permission_classes((IsAuthenticatedOrGETOnly,))
+def update_likes(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode("utf-8"))
+        try:
+            design = Design.objects.get(id=data['design_id'])
+        except Design.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        design.likes = design.likes + 1
+        design.save()
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticatedOrNothing,))
+def design_list(request, group_id):
+    if request.method == 'GET':
+        try:
+            designs = Design.objects.filter(group__id=group_id)
+        except Design.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        design_serializer = GroupDesignSerializer(designs, many=True)
+        return Response(design_serializer.data)  
