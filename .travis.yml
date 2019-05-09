@@ -4,14 +4,14 @@ language: generic
 matrix:
   include:
     
-    -language: node_js
-    node_js: 6.9.4
-    before_install: 
-      - cd ./frontend/
-    install:
-      - sudo npm install 
-    script: 
-      - sudo npm test 
+    #-language: node_js
+    #node_js: 6.9.4
+    #before_install: 
+    #  - cd ./frontend/
+    #install:
+    #  - sudo npm install 
+    #script: 
+    #  - sudo npm test 
 
     
     -language: python3
@@ -29,7 +29,7 @@ matrix:
       - sudo pip3 install -U setuptools
       - python3 -V
       - pip3 -V 
-      - cd ./backend/
+      #- cd ./backend/
     install: 
       - sudo pip3 install -r requirements.txt
     script:
