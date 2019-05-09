@@ -15,6 +15,7 @@ from .permissions import *
 from django.views.decorators.csrf import csrf_exempt
 
 from base64 import b64decode as decode
+import json
 import re
 # Create your views here.
 
@@ -187,32 +188,29 @@ def group_detail(request, **kwargs):
         return render(request, 'main/group_detail.html', context)    
 
 @csrf_exempt
-# @api_view(['GET', 'POST'])
-#@permission_classes((IsAuthenticatedOrGETOnly,))
-# @permission_classes((NoAuthenticationRequired,))
+@api_view(['GET', 'POST'])
+@permission_classes((IsAuthenticatedOrGETOnly,))
 def create_group(request):
-    return HttpResponseRedirect(request.POST.get('grouptype'))
-    # if request.method == 'GET':
-    #     try:
-    #         groups = Group.objects.all()
-    #     except Group.DoesNotExist:
-    #         return Response(status=status.HTTP_404_NOT_FOUND)
-    #     group_serializer = GroupSerializer(groups, many=True)
-    #     context = {
-    #         'form': GroupForm(),
-    #         'groupList': group_serializer.data
-    #     }
-    #     return render(request, 'main/create_group.html', context)
+    if request.method == 'GET':
+        try:
+            groups = Group.objects.all()
+        except Group.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        group_serializer = GroupSerializer(groups, many=True)
+        context = {
+            'form': GroupForm(),
+            'groupList': group_serializer.data
+        }
+        return render(request, 'main/create_group.html', context)
 
-    # if request.method == 'POST':
-        # group = Group()
-        # group.group_type = request.POST.get('grouptype')
-        # group.group_name = request.POST.get('groupname')
-        # group.save()
-        # group_serializer = GroupSerializer(group)
-        #return Response(group_serializer.data)
-        # return HttpResponseRedirect(request.POST.get('grouptype'))
-        # return HttpResponseRedirect('grouptype')
+    if request.method == 'POST':
+        data = json.loads(request.body.decode("utf-8"))
+        group = Group()
+        group.group_type = data['grouptype']
+        group.group_name = data['groupname']
+        group.save()
+        group_serializer = GroupSerializer(group)
+        return Response(group_serializer.data)
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticatedOrNothing,))
