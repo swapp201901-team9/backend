@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.core.files import File
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.http import HttpResponseRedirect,HttpResponse
 from homepage.models import *
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
@@ -11,8 +12,10 @@ from rest_framework.views import APIView
 from .forms import DesignForm, GroupForm
 from .serializers import *
 from .permissions import *
+from django.views.decorators.csrf import csrf_exempt
 
 from base64 import b64decode as decode
+import json
 import re
 # Create your views here.
 
@@ -184,6 +187,7 @@ def group_detail(request, **kwargs):
         }
         return render(request, 'main/group_detail.html', context)    
 
+@csrf_exempt
 @api_view(['GET', 'POST'])
 @permission_classes((IsAuthenticatedOrGETOnly,))
 def create_group(request):
@@ -200,16 +204,13 @@ def create_group(request):
         return render(request, 'main/create_group.html', context)
 
     if request.method == 'POST':
-        form = GroupForm(request.POST)
-        if form.is_valid():
-            group = Group()
-            group.group_type = form.cleaned_data['group_type']
-            group.group_name = form.cleaned_data['group_name']
-            group.save()
-            group_serializer = GroupSerializer(group)
-            return Response(group_serializer.data)
-            #return HttpResponseRedirect('/')
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        data = json.loads(request.body.decode("utf-8"))
+        group = Group()
+        group.group_type = data['grouptype']
+        group.group_name = data['groupname']
+        group.save()
+        group_serializer = GroupSerializer(group)
+        return Response(group_serializer.data)
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticatedOrNothing,))
