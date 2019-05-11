@@ -132,23 +132,14 @@ def profile(request, username):
 def main(request):
     # if request.user.id == None: 
     #     return Response(status=status.HTTP_403_FORBIDDEN)
-    try:
-        design = Design.objects.get(id=1)
-    except Design.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    try:
-        groups = Group.objects.all()
-    except Group.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    
     if request.method == 'GET':
-        user_serializer = UserDesignSerializer(design)
-        group_serializer = GroupSerializer(groups, many=True)
-        context = {
-            'form': DesignForm(),
-            'design': user_serializer.data,
-            'groupList': group_serializer.data
-        }
-        return render(request, 'main/index.html', context)
+        try:
+            design = Design.objects.get(id=1)
+        except Design.DoesNotExist:
+            design = Design()
+        design_serializer = UserDesignSerializer(design)
+        return Response(design_serializer.data)
     # elif request.method == 'PUT':
     #     if user!=request.user:
     #         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -204,10 +195,19 @@ def create_group(request):
         return render(request, 'main/create_group.html', context)
 
     if request.method == 'POST':
+        if request.user.id == None:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        try:
+            user = User.objects.get(username=request.user)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
         data = json.loads(request.body.decode("utf-8"))
         group = Group()
         group.group_type = data['grouptype']
         group.group_name = data['groupname']
+        group.users.add(user)
+        group.master = user
         group.save()
         group_serializer = GroupSerializer(group)
         return Response(group_serializer.data)
@@ -228,6 +228,26 @@ def group_list(request, username):
             return Response(status=status.HTTP_404_NOT_FOUND)
         group_serializer = GroupSerializer(groups, many=True)
         return Response(group_serializer.data)  
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticatedOrNothing,))
+def join_group(request, group_id):
+    if request.method == 'GET':
+        try:
+            group = Group.objects.get(id=group_id)
+        except Group.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        if request.user.id == None:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        try:
+            user = User.objects.get(username=request.user)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        group.users.add(user)
+        group_serializer = GroupSerializer(group)
+        return Response(group_serializer.data)
 
 @api_view(['GET'])
 def group_list_all(request):

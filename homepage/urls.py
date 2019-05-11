@@ -18,6 +18,7 @@ urlpatterns = [
     url(r'^groups/(?P<username>\w+)/$',views.group_list, name='group_list'),
     path('groups/', views.group_list_all, name='group_list_all'),
     url(r'^create_group/$', views.create_group, name='create_group'),
+    path('join_group/<int:group_id>/', views.join_group, name='join_group'),
     url(r'', views.main, name='main'),
     # url(r'login/', views.login.as_view(), name='login'),
     # url(r'logout/', views.logout.as_view(), name='logout'),
