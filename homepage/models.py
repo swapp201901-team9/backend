@@ -37,12 +37,7 @@ class Group(models.Model):
     )
     group_name = models.CharField(max_length=50)
     users = models.ManyToManyField('auth.User')
-    master = models.ForeignKey(
-        'auth.User',
-        related_name="master",
-        null=True,
-        on_delete=models.SET_NULL
-    )
+    master = models.ManyToManyField('auth.User', related_name="master")
 
     def __str__(self):
         return self.group_name
@@ -97,14 +92,14 @@ def create_profile_and_group(sender, instance, created, **kwargs):
         group = Group()
         group.group_type = USER
         group.group_name = 'user_group_'+instance.username
-        group.master = instance
         group.save()
+        group.master.add(instance)
         group.users.add(instance)
 
         profile = Profile()
         profile.user=instance
-        profile.groups.add(group)
         profile.user_group=group
         profile.save()
+        profile.groups.add(group)
         
 signals.post_save.connect(create_profile_and_group, sender='auth.User', weak=False)

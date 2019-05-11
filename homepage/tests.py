@@ -36,7 +36,7 @@ class UserJoinCase(TestCase):
             self.assertEqual(1, 2)
         self.assertEqual(group.group_type, 'UR')
         self.assertEqual(group.group_name, 'user_group_user01')
-        self.assertEqual(group.master, user)
+        self.assertTrue(user in group.master.all())
         self.assertFalse(group.id==None)
         
 

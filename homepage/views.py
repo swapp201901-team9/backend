@@ -221,9 +221,9 @@ def create_group(request):
         group = Group()
         group.group_type = data['grouptype']
         group.group_name = data['groupname']
-        group.users.add(user)
-        group.master = user
         group.save()
+        group.users.add(user)
+        group.master.add(user)
         group_serializer = GroupSerializer(group)
         return Response(group_serializer.data)
 
