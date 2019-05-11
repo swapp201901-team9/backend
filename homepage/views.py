@@ -129,11 +129,26 @@ def profile(request, username):
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 @permission_classes((IsAuthenticatedOrGETOnly,))
-def main(request):
-    # if request.user.id == None: 
-    #     return Response(status=status.HTTP_403_FORBIDDEN)
-    
+def main(request):    
     if request.method == 'GET':
+        if request.user.id == None: 
+            design = Design()
+        else:
+            try:
+                user = Profile.objects.get(user=request.user)
+            except Profile.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)    
+
+            design = user.recent
+            if design == None:
+                design = Design()
+                design.owner = request.user
+                design.group = user.user_group
+                design.save()
+                user.recent = design
+        design_serializer = UserDesignSerializer(design)
+        return Response(design_serializer.data)
+    if request.method == 'POST':
         try:
             design = Design.objects.get(id=1)
         except Design.DoesNotExist:
