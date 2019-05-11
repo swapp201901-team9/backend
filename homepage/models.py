@@ -35,6 +35,12 @@ class Group(models.Model):
     )
     group_name = models.CharField(max_length=50)
     users = models.ManyToManyField('auth.User')
+    master = models.ForeignKey(
+        'auth.User',
+        related_name="master",
+        null=True,
+        on_delete=models.SET_NULL
+    )
 
     def __str__(self):
         return self.group_name
