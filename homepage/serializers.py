@@ -38,12 +38,12 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ('user','myname','mybelong','myintro', 'myimage', 'domain')
 
 class GroupSerializer(serializers.ModelSerializer):
-    domain = serializers.SerializerMethodField()
-    def get_domain(self, obj):
-        return 'groupdetail/'+str(obj.id)+'/'
+    # domain = serializers.SerializerMethodField()
+    # def get_domain(self, obj):
+    #     return 'groupdetail/'+str(obj.id)+'/'
     class Meta:
         model = Group
-        fields = ('group_type','group_name','domain')
+        fields = '__all__'
 
 class UserDesignSerializer(serializers.ModelSerializer):
     '''
