@@ -3,6 +3,7 @@ from django.core.files import File
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import HttpResponseRedirect,HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 from homepage.models import *
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
@@ -12,7 +13,6 @@ from rest_framework.views import APIView
 from .forms import DesignForm, GroupForm
 from .serializers import *
 from .permissions import *
-from django.views.decorators.csrf import csrf_exempt
 
 from base64 import b64decode as decode
 import json
@@ -221,9 +221,9 @@ def create_group(request):
         group = Group()
         group.group_type = data['grouptype']
         group.group_name = data['groupname']
-        group.users.add(user)
-        group.master = user
         group.save()
+        group.users.add(user)
+        group.master.add(user)
         group_serializer = GroupSerializer(group)
         return Response(group_serializer.data)
 
