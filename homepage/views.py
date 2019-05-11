@@ -268,7 +268,7 @@ def join_group(request, group_id):
 def group_list_all(request):
     if request.method == 'GET':
         try:
-            groups = Group.objects.all()
+            groups = Group.objects.all().exclude(group_type='UR')
         except Group.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         group_serializer = GroupSerializer(groups, many=True)
