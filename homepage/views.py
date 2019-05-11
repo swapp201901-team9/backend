@@ -237,7 +237,11 @@ def group_list_all(request):
         except Group.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         group_serializer = GroupSerializer(groups, many=True)
-        return Response(group_serializer.data)
+        context = {
+            'groupList': group_serializer.data,
+        }
+        return render(request, 'main/group_detail.html', context) 
+        # return Response(group_serializer.data)
 
 @csrf_exempt
 @api_view(['GET', 'POST'])

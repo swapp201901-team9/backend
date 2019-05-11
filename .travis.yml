@@ -3,17 +3,6 @@ dist: trusty
 language: generic
 matrix:
   include:
-    
-    #-language: node_js
-    #node_js: 6.9.4
-    #before_install: 
-    #  - cd ./frontend/
-    #install:
-    #  - sudo npm install 
-    #script: 
-    #  - sudo npm test 
-
-    
     -language: python3
     virtualenv:
       system_site_packages: true
@@ -29,7 +18,7 @@ matrix:
       - sudo pip3 install -U setuptools
       - python3 -V
       - pip3 -V 
-      #- cd ./backend/
+
     install: 
       - sudo pip3 install -r requirements.txt
     script:
