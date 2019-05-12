@@ -289,6 +289,49 @@ def group_list_all(request):
         return Response(group_serializer.data)
 
 @csrf_exempt
+@api_view(['GET', 'POST', 'DELETE'])
+@permission_classes((IsAuthenticatedOrNothing,))
+def update_group(request, group_id):
+    if request.user.id == None:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    try:
+        user = User.objects.get(username=request.user)
+    except User.DoesNotExist:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        group = Group.objects.get(id=group_id)
+    except Group.DoesNotExist:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    if user not in group.master.all():
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    
+    if request.method == 'GET':
+        return Response({
+            "grouptype": group.group_type,
+            "groupname": group.group_name,
+        })
+
+    # if request.method == 'POST':
+        
+    #     data = json.loads(request.body.decode("utf-8"))
+        
+    #     try: # if there is a group that has same groupname, return 409
+    #         old_group = Group.objects.get(group_name = data['groupname'])
+    #         return Response(status = status.HTTP_409_CONFLICT)
+    #     except Group.DoesNotExist:
+    #         pass
+        
+    #     group = Group()
+    #     group.group_type = data['grouptype']
+    #     group.group_name = data['groupname']
+    #     group.save()
+    #     group.users.add(user)
+    #     group.master.add(user)
+    #     group_serializer = GroupSerializer(group)
+    #     return Response(group_serializer.data)
+
+@csrf_exempt
 @api_view(['GET', 'POST'])
 @permission_classes((IsAuthenticatedOrGETOnly,))
 def update_likes(request):
