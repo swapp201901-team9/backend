@@ -38,14 +38,14 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ('user','myname','mybelong','myintro', 'myimage', 'domain')
 
 class GroupSerializer(serializers.ModelSerializer):
-    admin = serializers.SerializerMethodField()
+    # admin = serializers.SerializerMethodField()
     
-    def __init__(self, *args, **kwargs):
-        serializers.ModelSerializer.__init__(self, *args, **kwargs)
-        self.user = kwargs['users']
+    # def __init__(self, *args, **kwargs):
+    #     serializers.ModelSerializer.__init__(self, *args, **kwargs)
+    #     self.user = kwargs['users']
     
-    def get_admin(self, obj):
-        return self.user in obj.master.all()
+    # def get_admin(self, obj):
+    #     return self.user in obj.master.all()
     
     class Meta:
         model = Group
