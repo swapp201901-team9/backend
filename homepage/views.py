@@ -173,41 +173,48 @@ def main(request):
     #         return Response(status=status.HTTP_204_NO_CONTENT)
     #     return Response(status=status.HTTP_403_FORBIDDEN)
 
-@api_view(['GET', 'PUT', 'DELETE'])
-#@permission_classes((IsAuthenticatedOrNothing,))
-def group_detail(request, **kwargs):
+@api_view(['GET'])
+@permission_classes((IsAuthenticatedOrNothing,))
+def group_detail(request, group_id):
     if request.method == 'GET':
+        if request.user.id == None:
+            return Response(status=status.HTTP_403_FORBIDDEN)
         try:
-            groups = Group.objects.all()
+            user = User.objects.get(username=request.user)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            group = Group.objects.get(id=group_id)
         except Group.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if user not in group.users.all():
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
         try:
-            designs = Design.objects.all()
+            designs = Design.objects.all().filter(group=group).order_by('likes').reverse()
         except Design.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        group_serializer = GroupSerializer(groups, many=True)
+        
         design_serializer = GroupDesignSerializer(designs, many=True)
-        context = {
-            'groupList': group_serializer.data,
-            'designList': design_serializer.data
-        }
-        return render(request, 'main/group_detail.html', context)    
+        
+        return Response(design_serializer.data)
 
 @csrf_exempt
-@api_view(['GET', 'POST'])
+@api_view(['POST'])
 @permission_classes((IsAuthenticatedOrGETOnly,))
 def create_group(request):
-    if request.method == 'GET':
-        try:
-            groups = Group.objects.all()
-        except Group.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        group_serializer = GroupSerializer(groups, many=True)
-        context = {
-            'form': GroupForm(),
-            'groupList': group_serializer.data
-        }
-        return render(request, 'main/create_group.html', context)
+    # if request.method == 'GET':
+    #     try:
+    #         groups = Group.objects.all()
+    #     except Group.DoesNotExist:
+    #         return Response(status=status.HTTP_404_NOT_FOUND)
+    #     group_serializer = GroupSerializer(groups, many=True)
+    #     context = {
+    #         'form': GroupForm(),
+    #         'groupList': group_serializer.data
+    #     }
+    #     return render(request, 'main/create_group.html', context)
 
     if request.method == 'POST':
         if request.user.id == None:
@@ -218,6 +225,13 @@ def create_group(request):
             return Response(status=status.HTTP_404_NOT_FOUND)
         
         data = json.loads(request.body.decode("utf-8"))
+        
+        try: # if there is a group that has same groupname, return 409
+            old_group = Group.objects.get(group_name = data['groupname'])
+            return Response(status = status.HTTP_409_CONFLICT)
+        except User.DoesNotExist:
+            pass
+        
         group = Group()
         group.group_type = data['grouptype']
         group.group_name = data['groupname']
@@ -268,7 +282,7 @@ def join_group(request, group_id):
 def group_list_all(request):
     if request.method == 'GET':
         try:
-            groups = Group.objects.all().exclude(group_type='UR')
+            groups = Group.objects.all().exclude(group_type='UR').order_by('created_at').reverse()
         except Group.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         group_serializer = GroupSerializer(groups, many=True)
