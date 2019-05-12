@@ -285,7 +285,7 @@ def group_list_all(request):
             groups = Group.objects.all().exclude(group_type='UR').order_by('created_at').reverse()
         except Group.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        group_serializer = GroupSerializer(groups, many=True)
+        group_serializer = GroupSerializer(instance=groups, user=request.user, many=True)
         return Response(group_serializer.data)
 
 @csrf_exempt
