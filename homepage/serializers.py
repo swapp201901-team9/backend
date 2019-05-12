@@ -28,22 +28,28 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 
-# class ProfileSerializer(serializers.ModelSerializer):
-#     user= serializers.ReadOnlyField(source='user.username')
-#     domain = serializers.SerializerMethodField()
-#     def get_domain(self, obj):
-#         return 'http://'+self.context['domain']+obj.myimage.url
-#     class Meta:
-#         model = Profile
-#         fields = ('user','myname','mybelong','myintro', 'myimage', 'domain')
-
-class GroupSerializer(serializers.ModelSerializer):
+class ProfileSerializer(serializers.ModelSerializer):
+    user= serializers.ReadOnlyField(source='user.username')
     domain = serializers.SerializerMethodField()
     def get_domain(self, obj):
-        return 'groupdetail/'+str(obj.id)+'/'
+        return 'http://'+self.context['domain']+obj.myimage.url
+    class Meta:
+        model = Profile
+        fields = ('user','myname','mybelong','myintro', 'myimage', 'domain')
+
+class GroupSerializer(serializers.ModelSerializer):
+    # admin = serializers.SerializerMethodField()
+    
+    # def __init__(self, *args, **kwargs):
+    #     serializers.ModelSerializer.__init__(self, *args, **kwargs)
+    #     self.user = kwargs['users']
+    
+    # def get_admin(self, obj):
+    #     return self.user in obj.master.all()
+    
     class Meta:
         model = Group
-        fields = ('group_type','group_name','domain')
+        fields = '__all__'
 
 class UserDesignSerializer(serializers.ModelSerializer):
     '''
