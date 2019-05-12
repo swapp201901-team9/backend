@@ -42,6 +42,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class GroupSerializer(serializers.ModelSerializer):
     admin = serializers.SerializerMethodField()
+    member = serializers.SerializerMethodField()
     
     def __init__(self, instance=None, user=None, data=empty, **kwargs):
         self.instance = instance
@@ -58,6 +59,12 @@ class GroupSerializer(serializers.ModelSerializer):
             return False
         else:
             return self.user in obj.master.all()
+
+    def get_member(self, obj):
+        if self.user == None:
+            return False
+        else:
+            return self.user in obj.users.all()
     
     class Meta:
         model = Group
@@ -89,3 +96,5 @@ class GroupDesignSerializer(serializers.ModelSerializer):
     class Meta:
         model = Design
         fields = '__all__'
+
+# class MemberSerializer(serializers.ModelSerializer):
