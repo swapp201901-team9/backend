@@ -288,7 +288,7 @@ def group_list_all(request):
         group_serializer = GroupSerializer(instance=groups, user=request.user, many=True)
         return Response(group_serializer.data)
 
-@csrf_exempt
+# @csrf_exempt
 @api_view(['GET', 'POST', 'DELETE'])
 @permission_classes((IsAuthenticatedOrNothing,))
 def update_group(request, group_id):
@@ -307,29 +307,29 @@ def update_group(request, group_id):
         return Response(status=status.HTTP_403_FORBIDDEN)
     
     if request.method == 'GET':
-        return Response({
-            "grouptype": group.group_type,
-            "groupname": group.group_name,
-        })
+        groups = Group.objects.filter(id=group_id)
+        group_serializer = GroupSerializer(instance=groups, many=True)
+        return Response(group_serializer.data)
 
     # if request.method == 'POST':
         
     #     data = json.loads(request.body.decode("utf-8"))
-        
+    #     groupname=data['groupname']
+    #     grouptype=data['grouptype']
     #     try: # if there is a group that has same groupname, return 409
-    #         old_group = Group.objects.get(group_name = data['groupname'])
+    #         old_group = Group.objects.get(group_name = groupname)
     #         return Response(status = status.HTTP_409_CONFLICT)
     #     except Group.DoesNotExist:
     #         pass
         
-    #     group = Group()
-    #     group.group_type = data['grouptype']
-    #     group.group_name = data['groupname']
+    #     group.group_type = grouptype
+    #     group.group_name = groupname
     #     group.save()
-    #     group.users.add(user)
-    #     group.master.add(user)
-    #     group_serializer = GroupSerializer(group)
-    #     return Response(group_serializer.data)
+        
+    #     return Response({
+    #         "grouptype": group.group_type,
+    #         "groupname": group.group_name,
+    #     })
 
 @csrf_exempt
 @api_view(['GET', 'POST'])
