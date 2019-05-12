@@ -229,7 +229,7 @@ def create_group(request):
         try: # if there is a group that has same groupname, return 409
             old_group = Group.objects.get(group_name = data['groupname'])
             return Response(status = status.HTTP_409_CONFLICT)
-        except User.DoesNotExist:
+        except Group.DoesNotExist:
             pass
         
         group = Group()
@@ -255,7 +255,7 @@ def group_list(request, username):
             groups = Group.objects.filter(users__username=username)
         except Group.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        group_serializer = GroupSerializer(groups, many=True)
+        group_serializer = GroupSerializer(groups, user=user, many=True)
         return Response(group_serializer.data)  
 
 @api_view(['GET'])

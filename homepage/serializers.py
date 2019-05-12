@@ -38,9 +38,15 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ('user','myname','mybelong','myintro', 'myimage', 'domain')
 
 class GroupSerializer(serializers.ModelSerializer):
-    # domain = serializers.SerializerMethodField()
-    # def get_domain(self, obj):
-    #     return 'groupdetail/'+str(obj.id)+'/'
+    admin = serializers.SerializerMethodField()
+    
+    def __init__(self, *args, **kwargs):
+        serializers.ModelSerializer.__init__(self, *args, **kwargs)
+        self.user = kwargs['users']
+    
+    def get_admin(self, obj):
+        return self.user in obj.master.all()
+    
     class Meta:
         model = Group
         fields = '__all__'
