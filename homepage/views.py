@@ -334,6 +334,28 @@ def update_group(request, group_id):
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticatedOrNothing,))
+def member_list(request, group_id):
+    if request.user.id == None:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    try:
+        user = User.objects.get(username=request.user)
+    except User.DoesNotExist:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        group = Group.objects.get(id=group_id)
+    except Group.DoesNotExist:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    if user not in group.master.all():
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    
+    if request.method == 'GET':
+        member_serializer = MemberSerializer(instance=group.users, group=group, many=True)
+        return Response(member_serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticatedOrNothing,))
 def update_likes(request, design_id):
     if request.method == 'GET':
         if request.user.id == None:

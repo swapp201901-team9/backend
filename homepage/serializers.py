@@ -97,4 +97,25 @@ class GroupDesignSerializer(serializers.ModelSerializer):
         model = Design
         fields = '__all__'
 
-# class MemberSerializer(serializers.ModelSerializer):
+class MemberSerializer(serializers.ModelSerializer):
+    admin = serializers.SerializerMethodField()
+    
+    def __init__(self, instance=None, group=None, data=empty, **kwargs):
+        self.instance = instance
+        if data is not empty:
+            self.initial_data = data
+        self.partial = kwargs.pop('partial', False)
+        self._context = kwargs.pop('context', {})
+        self.group = group
+        kwargs.pop('many', None)
+        super().__init__(**kwargs)
+
+    def get_admin(self, obj):
+        if self.group == None:
+            return False
+        else:
+            return obj in self.group.master.all()
+            
+    class Meta:
+        model = User
+        fields = ('id','username','admin')
