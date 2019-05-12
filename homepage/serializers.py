@@ -96,3 +96,5 @@ class GroupDesignSerializer(serializers.ModelSerializer):
     class Meta:
         model = Design
         fields = '__all__'
+
+# class MemberSerializer(serializers.ModelSerializer):

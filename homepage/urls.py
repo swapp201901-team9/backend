@@ -15,7 +15,7 @@ urlpatterns = [
     url(r'^profile/$',views.profile_list),
     
     path('groups/<int:group_id>/admin/', views.update_group, name='group_admin'),
-    # path('groups/<int:group_id>/like/<int:design_id>/', views.group_detail, name='group_detail'),
+    # path('groups/like/<int:design_id>/', views.group_detail, name='group_detail'),
     path('groups/<int:group_id>/', views.group_detail, name='group_detail'),
     url(r'^groups/(?P<username>\w+)/$',views.group_list, name='group_list'),
     path('groups/', views.group_list_all, name='group_list_all'),

@@ -288,8 +288,8 @@ def group_list_all(request):
         group_serializer = GroupSerializer(instance=groups, user=request.user, many=True)
         return Response(group_serializer.data)
 
-# @csrf_exempt
-@api_view(['GET', 'POST', 'DELETE'])
+@csrf_exempt
+@api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes((IsAuthenticatedOrNothing,))
 def update_group(request, group_id):
     if request.user.id == None:
@@ -311,25 +311,23 @@ def update_group(request, group_id):
         group_serializer = GroupSerializer(instance=groups, many=True)
         return Response(group_serializer.data)
 
-    # if request.method == 'POST':
+    if request.method == 'PUT':
+        data = json.loads(request.body.decode("utf-8"))
+        group_name=data['group_name']
+        group_type=data['group_type']
+        try: # if there is a group that has same groupname, return 409
+            old_group = Group.objects.get(group_name = group_name)
+            return Response(status = status.HTTP_409_CONFLICT)
+        except Group.DoesNotExist:
+            pass
         
-    #     data = json.loads(request.body.decode("utf-8"))
-    #     groupname=data['groupname']
-    #     grouptype=data['grouptype']
-    #     try: # if there is a group that has same groupname, return 409
-    #         old_group = Group.objects.get(group_name = groupname)
-    #         return Response(status = status.HTTP_409_CONFLICT)
-    #     except Group.DoesNotExist:
-    #         pass
+        group.group_type = group_type
+        group.group_name = group_name
+        group.save()
         
-    #     group.group_type = grouptype
-    #     group.group_name = groupname
-    #     group.save()
-        
-    #     return Response({
-    #         "grouptype": group.group_type,
-    #         "groupname": group.group_name,
-    #     })
+        groups = Group.objects.filter(id=group_id)
+        group_serializer = GroupSerializer(instance=groups, many=True)
+        return Response(group_serializer.data)
 
 @csrf_exempt
 @api_view(['GET', 'POST'])
