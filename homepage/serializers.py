@@ -4,6 +4,9 @@ from homepage.models import *
 from django.db.models import Sum, Q
 import base64
 from django.conf import settings
+from rest_framework.fields import (  # NOQA # isort:skip
+    CreateOnlyDefault, CurrentUserDefault, SkipField, empty
+)
 
 class UserSerializer(serializers.ModelSerializer):
     '''
@@ -38,14 +41,23 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ('user','myname','mybelong','myintro', 'myimage', 'domain')
 
 class GroupSerializer(serializers.ModelSerializer):
-    # admin = serializers.SerializerMethodField()
+    admin = serializers.SerializerMethodField()
     
-    # def __init__(self, *args, **kwargs):
-    #     serializers.ModelSerializer.__init__(self, *args, **kwargs)
-    #     self.user = kwargs['users']
-    
-    # def get_admin(self, obj):
-    #     return self.user in obj.master.all()
+    def __init__(self, instance=None, user=None, data=empty, **kwargs):
+        self.instance = instance
+        if data is not empty:
+            self.initial_data = data
+        self.partial = kwargs.pop('partial', False)
+        self._context = kwargs.pop('context', {})
+        self.user = user
+        kwargs.pop('many', None)
+        super().__init__(**kwargs)
+
+    def get_admin(self, obj):
+        if self.user == None:
+            return False
+        else:
+            return self.user in obj.master.all()
     
     class Meta:
         model = Group
