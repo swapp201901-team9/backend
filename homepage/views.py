@@ -329,18 +329,31 @@ def update_group(request, group_id):
         group_serializer = GroupSerializer(instance=groups, many=True)
         return Response(group_serializer.data)
 
-@csrf_exempt
-@api_view(['GET', 'POST'])
-@permission_classes((IsAuthenticatedOrGETOnly,))
-def update_likes(request):
-    if request.method == 'POST':
-        data = json.loads(request.body.decode("utf-8"))
+    if request.method == 'DELETE':
+        group.delete()
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticatedOrNothing,))
+def update_likes(request, design_id):
+    if request.method == 'GET':
+        if request.user.id == None:
+            return Response(status=status.HTTP_403_FORBIDDEN)
         try:
-            design = Design.objects.get(id=data['design_id'])
+            user = User.objects.get(username=request.user)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            design = Design.objects.get(id=design_id)
         except Design.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        if request.user not in design.group.users.all():
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
         design.likes = design.likes + 1
         design.save()
+        design_serializer = UserDesignSerializer(design)
+        return Response(design_serializer.data)
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticatedOrNothing,))
