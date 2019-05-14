@@ -127,10 +127,12 @@ def profile(request, username):
         return Response(status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_403_FORBIDDEN)
 
+@csrf_exempt
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 @permission_classes((IsAuthenticatedOrGETOnly,))
 def main(request):    
     if request.method == 'GET':
+        # check if user is logged in
         if request.user.id == None: 
             design = Design()
         else:
@@ -140,20 +142,72 @@ def main(request):
                 return Response(status=status.HTTP_404_NOT_FOUND)    
 
             design = user.recent
+            # if there is no design user is working on, create a new one
             if design == None:
                 design = Design()
                 design.owner = request.user
                 design.group = user.user_group
                 design.save()
                 user.recent = design
+                user.save()
         design_serializer = UserDesignSerializer(design)
         return Response(design_serializer.data)
-    if request.method == 'POST':
-        try:
-            design = Design.objects.get(id=1)
-        except Design.DoesNotExist:
-            design = Design()
+    
+    # for the rest of the methods
+    try:
+        user = Profile.objects.get(user=request.user)
+    except Profile.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)    
+    
+    # saves design to user group
+    if request.method == 'PUT':
+        data = json.loads(request.body.decode("utf-8"))
+        design_id=data['id']
+        if design_id != user.recent.id:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        user.recent.detail_body=data['detail_body']
+        user.recent.detail_sleeve=data['detail_sleeve']
+        user.recent.save()
+        design_serializer = UserDesignSerializer(user.recent)
+        return Response(design_serializer.data)
+
+    # doesn't really delete design but saves it in user group
+    # needs to be deleted in user group detail
+    if request.method == 'DELETE':
+        design = Design()
+        design.owner = request.user
+        design.group = user.user_group
+        design.save()
+        user.recent = design
+        user.save()
+        
         design_serializer = UserDesignSerializer(design)
+        return Response(design_serializer.data)
+
+    # save design and copys design to requested group
+    if request.method == 'POST':
+        design_id=request.data['id']
+        if design_id != user.recent.id:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        user.recent.detail_body=request.data['detail_body']
+        user.recent.detail_sleeve=request.data['detail_sleeve']
+        user.recent.save()
+
+        try:
+            group = Group.objects.get(id=request.data['group'])
+        except Group.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if request.user not in group.users.all():
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        post_design=Design()
+        post_design.owner = request.user
+        post_design.group = group
+        post_design.detail_body = request.data['detail_body']
+        post_design.detail_sleeve = request.data['detail_sleeve']
+        post_design.save()
+
+        design_serializer = UserDesignSerializer(user.recent)
         return Response(design_serializer.data)
     # elif request.method == 'PUT':
     #     if user!=request.user:
