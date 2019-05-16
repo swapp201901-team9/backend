@@ -250,7 +250,7 @@ def group_detail(request, group_id):
         except Design.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         
-        design_serializer = GroupDesignSerializer(designs, many=True)
+        design_serializer = GroupDesignSerializer(designs, user=request.user, many=True)
         
         return Response(design_serializer.data)
 

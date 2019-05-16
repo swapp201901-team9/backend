@@ -41,30 +41,30 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ('user','myname','mybelong','myintro', 'myimage', 'domain')
 
 class GroupSerializer(serializers.ModelSerializer):
-    # admin = serializers.SerializerMethodField()
-    # member = serializers.SerializerMethodField()
+    admin = serializers.SerializerMethodField()
+    member = serializers.SerializerMethodField()
     
-    # def __init__(self, instance=None, user=None, data=empty, **kwargs):
-    #     self.instance = instance
-    #     if data is not empty:
-    #         self.initial_data = data
-    #     self.partial = kwargs.pop('partial', False)
-    #     self._context = kwargs.pop('context', {})
-    #     self.user = user
-    #     kwargs.pop('many', None)
-    #     super().__init__(**kwargs)
+    def __init__(self, instance=None, user=None, data=empty, **kwargs):
+        self.instance = instance
+        if data is not empty:
+            self.initial_data = data
+        self.partial = kwargs.pop('partial', False)
+        self._context = kwargs.pop('context', {})
+        self.user = user
+        kwargs.pop('many', None)
+        super().__init__(**kwargs)
 
-    # def get_admin(self, obj):
-    #     if self.user == None:
-    #         return False
-    #     else:
-    #         return self.user in obj.master.all()
+    def get_admin(self, obj):
+        if self.user == None:
+            return False
+        else:
+            return self.user in obj.master.all()
 
-    # def get_member(self, obj):
-    #     if self.user == None:
-    #         return False
-    #     else:
-    #         return self.user in obj.users.all()
+    def get_member(self, obj):
+        if self.user == None:
+            return False
+        else:
+            return self.user in obj.users.all()
     
     class Meta:
         model = Group
@@ -93,23 +93,23 @@ class UserDesignSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class GroupDesignSerializer(serializers.ModelSerializer):
-    admin = serializers.SerializerMethodField()
+    auth = serializers.SerializerMethodField()
     
-    def __init__(self, instance=None, group=None, data=empty, **kwargs):
+    def __init__(self, instance=None, user=None, data=empty, **kwargs):
         self.instance = instance
         if data is not empty:
             self.initial_data = data
         self.partial = kwargs.pop('partial', False)
         self._context = kwargs.pop('context', {})
-        self.group = group
+        self.user = user
         kwargs.pop('many', None)
         super().__init__(**kwargs)
 
-    def get_admin(self, obj):
-        if self.group == None:
+    def get_auth(self, obj):
+        if self.user == None:
             return False
         else:
-            return obj in self.group.master.all()
+            return self.user in obj.group.master.all() or self.user == obj.owner
     
     class Meta:
         model = Design
