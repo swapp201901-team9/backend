@@ -497,9 +497,4 @@ def delete_design(request, design_id):
     
         design.delete()
 
-        try:
-            designs = Design.objects.filter(group__id=group_id)
-        except Design.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        design_serializer = GroupDesignSerializer(designs, many=True)
-        return Response(design_serializer.data)
+        return Response(status=status.HTTP_200_OK)
