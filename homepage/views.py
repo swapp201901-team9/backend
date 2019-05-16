@@ -369,6 +369,8 @@ def update_group(request, group_id):
         group_name=request.data['group_name']
         group_type=request.data['group_type']
 
+        if group_type=='UR':
+            return Response(status = status.HTTP_403_FORBIDDEN)
         try: # if there is a group that has same groupname, return 409
             old_group = Group.objects.get(group_name = group_name)
             return Response(status = status.HTTP_409_CONFLICT)
