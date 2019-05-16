@@ -495,4 +495,11 @@ def delete_design(request, design_id):
         if request.user not in design.group.master.all() and request.user != design.owner:
             return Response(status=status.HTTP_403_FORBIDDEN)
     
-        design.remove()
+        design.delete()
+
+        try:
+            designs = Design.objects.filter(group__id=group_id)
+        except Design.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        design_serializer = GroupDesignSerializer(designs, many=True)
+        return Response(design_serializer.data)
