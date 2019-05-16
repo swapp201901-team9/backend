@@ -366,9 +366,9 @@ def update_group(request, group_id):
         return Response(group_serializer.data)
 
     if request.method == 'PUT':
-        data = json.loads(request.body.decode("utf-8"))
-        group_name=data['group_name']
-        group_type=data['group_type']
+        group_name=request.data['group_name']
+        group_type=request.data['group_type']
+
         try: # if there is a group that has same groupname, return 409
             old_group = Group.objects.get(group_name = group_name)
             return Response(status = status.HTTP_409_CONFLICT)
@@ -476,3 +476,23 @@ def design_list(request, group_id):
             return Response(status=status.HTTP_404_NOT_FOUND)
         design_serializer = GroupDesignSerializer(designs, many=True)
         return Response(design_serializer.data)  
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticatedOrNothing,))
+def delete_design(request, design_id):
+    if request.method == 'GET':
+        if request.user.id == None:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        try:
+            user = User.objects.get(username=request.user)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            design = Design.objects.get(id=design_id)
+        except Design.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if request.user not in design.group.master.all() and request.user != design.owner:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+    
+        design.remove()
