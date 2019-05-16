@@ -4,13 +4,13 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import HttpResponseRedirect,HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from homepage.models import *
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .forms import DesignForm, GroupForm
+from .models import *
 from .serializers import *
 from .permissions import *
 
@@ -250,7 +250,7 @@ def group_detail(request, group_id):
         except Design.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         
-        design_serializer = GroupDesignSerializer(designs, many=True)
+        design_serializer = GroupDesignSerializer(designs, user=request.user, many=True)
         
         return Response(design_serializer.data)
 
