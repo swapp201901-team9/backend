@@ -167,6 +167,9 @@ def main(request):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         user.recent.detail_body=data['detail_body']
         user.recent.detail_sleeve=data['detail_sleeve']
+        user.recent.detail_buttons=data['detail_buttons']
+        user.recent.detail_banding=data['detail_banding']
+        user.recent.detail_stripes=data['detail_stripes']
         user.recent.save()
         design_serializer = UserDesignSerializer(user.recent)
         return Response(design_serializer.data)
@@ -191,6 +194,9 @@ def main(request):
     #         return Response(status=status.HTTP_400_BAD_REQUEST)
     #     user.recent.detail_body=request.data['detail_body']
     #     user.recent.detail_sleeve=request.data['detail_sleeve']
+        # user.recent.detail_buttons=request.data['detail_buttons']
+        # user.recent.detail_banding=request.data['detail_banding']
+        # user.recent.detail_stripes=request.data['detail_stripes']
     #     user.recent.save()
 
     #     try:
@@ -205,6 +211,9 @@ def main(request):
     #     post_design.group = group
     #     post_design.detail_body = request.data['detail_body']
     #     post_design.detail_sleeve = request.data['detail_sleeve']
+    # post_design.detail_buttons=request.data['detail_buttons']
+        # post_design.detail_banding=request.data['detail_banding']
+        # post_design.detail_stripes=request.data['detail_stripes']
     #     post_design.save()
 
     #     design_serializer = UserDesignSerializer(user.recent)
@@ -232,6 +241,9 @@ def post_design(request, group_id, design_id):
         post_design.group = group
         post_design.detail_body = design.detail_body
         post_design.detail_sleeve = design.detail_sleeve
+        post_design.detail_buttons = design.detail_buttons
+        post_design.detail_banding = design.detail_banding
+        post_design.detail_stripes = design.detail_stripes
         post_design.save()
 
         design_serializer = UserDesignSerializer(post_design)
