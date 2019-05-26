@@ -419,16 +419,12 @@ def member_list(request, group_id):
 def update_member(request, group_id, user_id):
     if request.user.id == None:
         return Response(status=status.HTTP_403_FORBIDDEN)
-    try:
-        user = User.objects.get(id=request.user.id)
-    except User.DoesNotExist:
-        return Response(status=status.HTTP_403_FORBIDDEN)
     
     try:
         group = Group.objects.get(id=group_id)
     except Group.DoesNotExist:
         return Response(status=status.HTTP_400_BAD_REQUEST)
-    if user not in group.master.all():
+    if request.user not in group.master.all():
         return Response(status=status.HTTP_403_FORBIDDEN)
     
     try:
@@ -438,17 +434,43 @@ def update_member(request, group_id, user_id):
     if target_user not in group.users.all():
         return Response(status=status.HTTP_400_BAD_REQUEST)
     
+    if request.method == 'GET':
+        return Response(status=status.HTTP_200_OK)
     if request.method == 'PUT':
         if target_user not in group.master.all():
             group.master.add(target_user)
     
     if request.method == 'DELETE':
+        if target_user == request.user:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         group.users.remove(target_user)
         if target_user in group.master.all():
             group.master.remove(target_user)
     
     member_serializer = MemberSerializer(instance=group.users, group=group, many=True)
     return Response(member_serializer.data)
+
+@api_view(['GET',])
+@permission_classes((IsAuthenticatedOrNothing,))
+def drop_group(request, group_id):
+    if request.user.id == None:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        group = Group.objects.get(id=group_id)
+    except Group.DoesNotExist:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    if request.user not in group.users.all():
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    
+    if request.method == 'GET':
+        if request.user in group.master.all() and group.master.all().count()<=1:
+            return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+        group.users.remove(request.user)
+        if request.user in group.master.all():
+            group.master.remove(request.user)
+    
+    return Response(status=status.HTTP_202_ACCEPTED)
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticatedOrNothing,))
