@@ -9,7 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .forms import DesignForm, GroupForm
+# from .forms import DesignForm, GroupForm
 from .models import *
 from .serializers import *
 from .permissions import *
@@ -128,7 +128,7 @@ def profile(request, username):
     return Response(status=status.HTTP_403_FORBIDDEN)
 
 @csrf_exempt
-@api_view(['GET', 'POST', 'PUT', 'DELETE'])
+@api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes((IsAuthenticatedOrGETOnly,))
 def main(request):    
     if request.method == 'GET':
