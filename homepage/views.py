@@ -467,8 +467,37 @@ def update_likes(request, design_id):
             return Response(status=status.HTTP_404_NOT_FOUND)
         if request.user not in design.group.users.all():
             return Response(status=status.HTTP_403_FORBIDDEN)
+        if request.user in design.who.all():
+            return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
         
+        design.who.add(user)
         design.likes = design.likes + 1
+        design.save()
+        design_serializer = UserDesignSerializer(design)
+        return Response(design_serializer.data)
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticatedOrNothing,))
+def undo_likes(request, design_id):
+    if request.method == 'GET':
+        if request.user.id == None:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        try:
+            user = User.objects.get(username=request.user)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            design = Design.objects.get(id=design_id)
+        except Design.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if request.user not in design.group.users.all():
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        if request.user not in design.who.all():
+            return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+        
+        design.who.remove(user)
+        design.likes = design.likes - 1
         design.save()
         design_serializer = UserDesignSerializer(design)
         return Response(design_serializer.data)

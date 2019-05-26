@@ -47,6 +47,7 @@ class Design(models.Model):
     owner = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     likes = models.IntegerField(default=0)
+    who = models.ManyToManyField('auth.User', related_name="who")
     detail_body = models.CharField(
         max_length=2,
         choices=COLOR_CHOICES,

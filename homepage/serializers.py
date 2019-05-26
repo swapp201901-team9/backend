@@ -94,7 +94,8 @@ class UserDesignSerializer(serializers.ModelSerializer):
 
 class GroupDesignSerializer(serializers.ModelSerializer):
     auth = serializers.SerializerMethodField()
-    
+    liked = serializers.SerializerMethodField()
+
     def __init__(self, instance=None, user=None, data=empty, **kwargs):
         self.instance = instance
         if data is not empty:
@@ -110,6 +111,9 @@ class GroupDesignSerializer(serializers.ModelSerializer):
             return False
         else:
             return self.user in obj.group.master.all() or self.user == obj.owner
+
+    def get_liked(self, obj):
+        return self.user in obj.who.all()
     
     class Meta:
         model = Design
