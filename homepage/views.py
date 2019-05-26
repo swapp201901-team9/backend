@@ -357,13 +357,17 @@ def update_group(request, group_id):
         group = Group.objects.get(id=group_id)
     except Group.DoesNotExist:
         return Response(status=status.HTTP_400_BAD_REQUEST)
-    if user not in group.master.all():
-        return Response(status=status.HTTP_403_FORBIDDEN)
     
+    if user not in group.users.all():
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
     if request.method == 'GET':
         groups = Group.objects.filter(id=group_id)
         group_serializer = GroupSerializer(instance=groups, many=True)
         return Response(group_serializer.data)
+
+    if user not in group.master.all():
+        return Response(status=status.HTTP_403_FORBIDDEN)
 
     if request.method == 'PUT':
         group_name=request.data['group_name']
@@ -387,6 +391,7 @@ def update_group(request, group_id):
 
     if request.method == 'DELETE':
         group.delete()
+        return Response(status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticatedOrNothing,))
