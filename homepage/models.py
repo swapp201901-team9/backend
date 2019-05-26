@@ -49,24 +49,24 @@ class Design(models.Model):
     likes = models.IntegerField(default=0)
     who = models.ManyToManyField('auth.User', related_name="who", blank=True)
     detail_body = models.CharField(
-        max_length=6,
-        default="ffffff",
+        max_length=7,
+        default="#ffffff",
     )
     detail_buttons = models.CharField(
-        max_length=6,
-        default="ffffff",
+        max_length=7,
+        default="#ffffff",
     )
     detail_sleeve = models.CharField(
-        max_length=6,
-        default="ffffff",
+        max_length=7,
+        default="#ffffff",
     )
     detail_banding = models.CharField(
-        max_length=6,
-        default="ffffff",
+        max_length=7,
+        default="#ffffff",
     )
     detail_stripes = models.CharField(
-        max_length=6,
-        default="ffffff",
+        max_length=7,
+        default="#ffffff",
     )
 
     def __str__(self):
