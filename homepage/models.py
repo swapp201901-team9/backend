@@ -3,22 +3,22 @@ from django.db.models import signals
 from django.contrib.auth.models import User
 import base64
 
-BLACK = 'BK'
-BEIGE = 'BG'
-BLUE = 'BL'
-IVORY = 'IV'
-PINK = 'PK'
-RED = 'RD'
-WHITE = 'WT'
-COLOR_CHOICES = (
-    (BLACK, 'Black'),
-    (BEIGE, 'Beige'),
-    (BLUE, 'Blue'),
-    (IVORY, 'Ivory'),
-    (PINK, 'Pink'),
-    (RED, 'Red'),
-    (WHITE, 'White'),
-)
+# BLACK = 'BK'
+# BEIGE = 'BG'
+# BLUE = 'BL'
+# IVORY = 'IV'
+# PINK = 'PK'
+# RED = 'RD'
+# WHITE = 'WT'
+# COLOR_CHOICES = (
+#     (BLACK, 'Black'),
+#     (BEIGE, 'Beige'),
+#     (BLUE, 'Blue'),
+#     (IVORY, 'Ivory'),
+#     (PINK, 'Pink'),
+#     (RED, 'Red'),
+#     (WHITE, 'White'),
+# )
 
 MAJOR = 'MJ'
 CLUB = 'CL'
@@ -49,14 +49,24 @@ class Design(models.Model):
     likes = models.IntegerField(default=0)
     who = models.ManyToManyField('auth.User', related_name="who", blank=True)
     detail_body = models.CharField(
-        max_length=2,
-        choices=COLOR_CHOICES,
-        default=BLACK,
+        max_length=6,
+        default="ffffff",
+    )
+    detail_buttons = models.CharField(
+        max_length=6,
+        default="ffffff",
     )
     detail_sleeve = models.CharField(
-        max_length=2,
-        choices=COLOR_CHOICES,
-        default=WHITE,
+        max_length=6,
+        default="ffffff",
+    )
+    detail_banding = models.CharField(
+        max_length=6,
+        default="ffffff",
+    )
+    detail_stripes = models.CharField(
+        max_length=6,
+        default="ffffff",
     )
 
     def __str__(self):
