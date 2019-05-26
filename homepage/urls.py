@@ -17,6 +17,7 @@ urlpatterns = [
     path('groups/<int:group_id>/admin/', views.update_group, name='group_admin'),
     path('groups/<int:group_id>/members/<int:user_id>/', views.update_member, name='update_member'),
     path('groups/<int:group_id>/members/', views.member_list, name='member_list'),
+    path('groups/<int:group_id>/drop/', views.drop_group, name='group_withdraw'),
     path('groups/like/<int:design_id>/', views.update_likes, name='update_likes'),
     path('groups/unlike/<int:design_id>/', views.undo_likes, name='undo_likes'),
     path('groups/delete/<int:design_id>/', views.delete_design, name='delete_design'),
