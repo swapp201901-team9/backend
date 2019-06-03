@@ -84,9 +84,9 @@ class GetEmptyDesignCase(TestCase):
         response.render()
         stream = io.BytesIO(response.content)
         data = JSONParser().parse(stream)
-        self.assertEqual(data['detail_sleeve'], 'WT')
+        self.assertEqual(data['detail_sleeve'], '#ffffff')
         self.assertEqual(data['likes'], 0)
-        self.assertEqual(data['detail_body'], 'BK')
+        self.assertEqual(data['detail_body'], '#ffffff')
         # id, group, owner should be null for non-authorized requests
         self.assertEqual(data['id'], None)
         self.assertEqual(data['group'], None)
@@ -98,9 +98,9 @@ class GetEmptyDesignCase(TestCase):
         response.render()
         stream = io.BytesIO(response.content)
         data = JSONParser().parse(stream)
-        self.assertEqual(data['detail_sleeve'], 'WT')
+        self.assertEqual(data['detail_sleeve'], '#ffffff')
         self.assertEqual(data['likes'], 0)
-        self.assertEqual(data['detail_body'], 'BK')
+        self.assertEqual(data['detail_body'], '#ffffff')
         # id, group, owner should not be null for authorized requests
         self.assertFalse(data['id']==None)
         self.assertEquals(Group.objects.get(id=data['group']).group_name, 'user_group_user03')
