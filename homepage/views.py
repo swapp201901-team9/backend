@@ -9,7 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .forms import DesignForm, GroupForm
+# from .forms import DesignForm, GroupForm
 from .models import *
 from .serializers import *
 from .permissions import *
@@ -128,7 +128,7 @@ def profile(request, username):
     return Response(status=status.HTTP_403_FORBIDDEN)
 
 @csrf_exempt
-@api_view(['GET', 'POST', 'PUT', 'DELETE'])
+@api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes((IsAuthenticatedOrGETOnly,))
 def main(request):    
     if request.method == 'GET':
@@ -167,6 +167,9 @@ def main(request):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         user.recent.detail_body=data['detail_body']
         user.recent.detail_sleeve=data['detail_sleeve']
+        user.recent.detail_buttons=data['detail_buttons']
+        user.recent.detail_banding=data['detail_banding']
+        user.recent.detail_stripes=data['detail_stripes']
         user.recent.save()
         design_serializer = UserDesignSerializer(user.recent)
         return Response(design_serializer.data)
@@ -184,48 +187,67 @@ def main(request):
         design_serializer = UserDesignSerializer(design)
         return Response(design_serializer.data)
 
-    # save design and copys design to requested group
-    if request.method == 'POST':
-        design_id=request.data['id']
-        if design_id != user.recent.id:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        user.recent.detail_body=request.data['detail_body']
-        user.recent.detail_sleeve=request.data['detail_sleeve']
-        user.recent.save()
+    # # save design and copys design to requested group
+    # if request.method == 'POST':
+    #     design_id=request.data['id']
+    #     if design_id != user.recent.id:
+    #         return Response(status=status.HTTP_400_BAD_REQUEST)
+    #     user.recent.detail_body=request.data['detail_body']
+    #     user.recent.detail_sleeve=request.data['detail_sleeve']
+        # user.recent.detail_buttons=request.data['detail_buttons']
+        # user.recent.detail_banding=request.data['detail_banding']
+        # user.recent.detail_stripes=request.data['detail_stripes']
+    #     user.recent.save()
 
+    #     try:
+    #         group = Group.objects.get(id=request.data['group'])
+    #     except Group.DoesNotExist:
+    #         return Response(status=status.HTTP_400_BAD_REQUEST)
+    #     if request.user not in group.users.all():
+    #         return Response(status=status.HTTP_403_FORBIDDEN)
+        
+    #     post_design=Design()
+    #     post_design.owner = request.user
+    #     post_design.group = group
+    #     post_design.detail_body = request.data['detail_body']
+    #     post_design.detail_sleeve = request.data['detail_sleeve']
+    # post_design.detail_buttons=request.data['detail_buttons']
+        # post_design.detail_banding=request.data['detail_banding']
+        # post_design.detail_stripes=request.data['detail_stripes']
+    #     post_design.save()
+
+    #     design_serializer = UserDesignSerializer(user.recent)
+    #     return Response(design_serializer.data)
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticatedOrNothing,))
+def post_design(request, group_id, design_id):
+    # copys design to requested group
+    if request.method == 'GET':
         try:
-            group = Group.objects.get(id=request.data['group'])
+            group = Group.objects.get(id=group_id)
         except Group.DoesNotExist:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         if request.user not in group.users.all():
             return Response(status=status.HTTP_403_FORBIDDEN)
         
+        try:
+            design = Design.objects.get(id=design_id)
+        except Design.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)        
+
         post_design=Design()
         post_design.owner = request.user
         post_design.group = group
-        post_design.detail_body = request.data['detail_body']
-        post_design.detail_sleeve = request.data['detail_sleeve']
+        post_design.detail_body = design.detail_body
+        post_design.detail_sleeve = design.detail_sleeve
+        post_design.detail_buttons = design.detail_buttons
+        post_design.detail_banding = design.detail_banding
+        post_design.detail_stripes = design.detail_stripes
         post_design.save()
 
-        design_serializer = UserDesignSerializer(user.recent)
+        design_serializer = UserDesignSerializer(post_design)
         return Response(design_serializer.data)
-    # elif request.method == 'PUT':
-    #     if user!=request.user:
-    #         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-    #     serializer = UserSerializer(user,data=request.data)
-    #     if serializer.is_valid():
-    #         # if password is bad, return 400
-    #         pwd=request.data['password']
-    #         if(pwd==''):
-    #             return Response(status=status.HTTP_400_BAD_REQUEST)
-    #         serializer.save()
-    #         return Response(serializer.data)
-    #     return Response(status=status.HTTP_400_BAD_REQUEST)
-    # elif request.method == 'DELETE':
-    #     if user == request.user:
-    #         user.delete()
-    #         return Response(status=status.HTTP_204_NO_CONTENT)
-    #     return Response(status=status.HTTP_403_FORBIDDEN)
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticatedOrNothing,))
@@ -357,13 +379,17 @@ def update_group(request, group_id):
         group = Group.objects.get(id=group_id)
     except Group.DoesNotExist:
         return Response(status=status.HTTP_400_BAD_REQUEST)
-    if user not in group.master.all():
-        return Response(status=status.HTTP_403_FORBIDDEN)
     
+    if user not in group.users.all():
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
     if request.method == 'GET':
         groups = Group.objects.filter(id=group_id)
         group_serializer = GroupSerializer(instance=groups, many=True)
         return Response(group_serializer.data)
+
+    if user not in group.master.all():
+        return Response(status=status.HTTP_403_FORBIDDEN)
 
     if request.method == 'PUT':
         group_name=request.data['group_name']
@@ -387,6 +413,7 @@ def update_group(request, group_id):
 
     if request.method == 'DELETE':
         group.delete()
+        return Response(status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticatedOrNothing,))
@@ -414,16 +441,12 @@ def member_list(request, group_id):
 def update_member(request, group_id, user_id):
     if request.user.id == None:
         return Response(status=status.HTTP_403_FORBIDDEN)
-    try:
-        user = User.objects.get(id=request.user.id)
-    except User.DoesNotExist:
-        return Response(status=status.HTTP_403_FORBIDDEN)
     
     try:
         group = Group.objects.get(id=group_id)
     except Group.DoesNotExist:
         return Response(status=status.HTTP_400_BAD_REQUEST)
-    if user not in group.master.all():
+    if request.user not in group.master.all():
         return Response(status=status.HTTP_403_FORBIDDEN)
     
     try:
@@ -433,17 +456,43 @@ def update_member(request, group_id, user_id):
     if target_user not in group.users.all():
         return Response(status=status.HTTP_400_BAD_REQUEST)
     
+    if request.method == 'GET':
+        return Response(status=status.HTTP_200_OK)
     if request.method == 'PUT':
         if target_user not in group.master.all():
             group.master.add(target_user)
     
     if request.method == 'DELETE':
+        if target_user == request.user:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         group.users.remove(target_user)
         if target_user in group.master.all():
             group.master.remove(target_user)
     
     member_serializer = MemberSerializer(instance=group.users, group=group, many=True)
     return Response(member_serializer.data)
+
+@api_view(['GET',])
+@permission_classes((IsAuthenticatedOrNothing,))
+def drop_group(request, group_id):
+    if request.user.id == None:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    
+    try:
+        group = Group.objects.get(id=group_id)
+    except Group.DoesNotExist:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    if request.user not in group.users.all():
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    
+    if request.method == 'GET':
+        if request.user in group.master.all() and group.master.all().count()<=1:
+            return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+        group.users.remove(request.user)
+        if request.user in group.master.all():
+            group.master.remove(request.user)
+    
+    return Response(status=status.HTTP_202_ACCEPTED)
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticatedOrNothing,))
@@ -462,8 +511,37 @@ def update_likes(request, design_id):
             return Response(status=status.HTTP_404_NOT_FOUND)
         if request.user not in design.group.users.all():
             return Response(status=status.HTTP_403_FORBIDDEN)
+        if request.user in design.who.all():
+            return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
         
+        design.who.add(user)
         design.likes = design.likes + 1
+        design.save()
+        design_serializer = UserDesignSerializer(design)
+        return Response(design_serializer.data)
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticatedOrNothing,))
+def undo_likes(request, design_id):
+    if request.method == 'GET':
+        if request.user.id == None:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        try:
+            user = User.objects.get(username=request.user)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            design = Design.objects.get(id=design_id)
+        except Design.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if request.user not in design.group.users.all():
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        if request.user not in design.who.all():
+            return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+        
+        design.who.remove(user)
+        design.likes = design.likes - 1
         design.save()
         design_serializer = UserDesignSerializer(design)
         return Response(design_serializer.data)
