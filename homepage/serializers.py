@@ -93,6 +93,28 @@ class UserDesignSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class GroupDesignSerializer(serializers.ModelSerializer):
+    auth = serializers.SerializerMethodField()
+    liked = serializers.SerializerMethodField()
+
+    def __init__(self, instance=None, user=None, data=empty, **kwargs):
+        self.instance = instance
+        if data is not empty:
+            self.initial_data = data
+        self.partial = kwargs.pop('partial', False)
+        self._context = kwargs.pop('context', {})
+        self.user = user
+        kwargs.pop('many', None)
+        super().__init__(**kwargs)
+
+    def get_auth(self, obj):
+        if self.user == None:
+            return False
+        else:
+            return self.user in obj.group.master.all() or self.user == obj.owner
+
+    def get_liked(self, obj):
+        return self.user in obj.who.all()
+    
     class Meta:
         model = Design
         fields = '__all__'
