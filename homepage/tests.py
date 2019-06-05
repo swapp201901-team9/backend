@@ -124,8 +124,7 @@ class SaveDesignCase(TestCase):
             \"detail_sleeve\": \"#232323\",
             \"detail_banding\": \"#232323\",
             \"detail_stripes\": \"#232323\",
-            \"id\": 1
-        }"""
+            \"id\": """+str(design_id)+"}"
         self.client.put(path='/', data=design_detail, content_type='application/json')
         response = self.client.get('/')
         self.assertEqual(response.status_code//100, 2)
@@ -155,8 +154,7 @@ class NewDesignCase(TestCase):
             \"detail_sleeve\": \"#232323\",
             \"detail_banding\": \"#232323\",
             \"detail_stripes\": \"#232323\",
-            \"id\": 1
-        }"""
+            \"id\": """+str(self.design_id)+"}"
         self.client.put(path='/', data=design_detail, content_type='application/json')
 
     def test_new_design(self):
