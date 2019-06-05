@@ -110,14 +110,23 @@ class SaveDesignCase(TestCase):
         data = JSONParser().parse(stream)
         design_id = data['id']
         """save design"""
-        self.client.put(path='/', data={
+        # self.client.put(path='/', data={
+        #     "detail_body": "#232323",
+        #     "detail_buttons": "#232323",
+        #     "detail_sleeve": "#232323",
+        #     "detail_banding": "#232323",
+        #     "detail_stripes": "#232323",
+        #     "id": design_id
+        # }, content_type='application/json')
+        design_detail = {
             "detail_body": "#232323",
             "detail_buttons": "#232323",
             "detail_sleeve": "#232323",
             "detail_banding": "#232323",
             "detail_stripes": "#232323",
             "id": design_id
-        }, content_type='application/json')
+        }
+        self.client.put(path='/', data=design_detail, content_type='application/json')
         response = self.client.get('/')
         self.assertEqual(response.status_code//100, 2)
         response.render()
@@ -140,14 +149,15 @@ class NewDesignCase(TestCase):
         stream = io.BytesIO(response.content)
         data = JSONParser().parse(stream)
         self.design_id = data['id']
-        self.client.put(path='/', data={
+        design_detail = {
             "detail_body": "#232323",
             "detail_buttons": "#232323",
             "detail_sleeve": "#232323",
             "detail_banding": "#232323",
             "detail_stripes": "#232323",
             "id": self.design_id
-        }, content_type='application/json')
+        }
+        self.client.put(path='/', data=design_detail, content_type='application/json')
 
     def test_new_design(self):
         response = self.client.delete('/')
