@@ -72,6 +72,15 @@ class Design(models.Model):
     def __str__(self):
         return str(self.group)+'_'+str(self.owner)+"_"+str(self.id)
 
+# class Text(models.Model):
+#     text_value = models.CharField(max_length=50)
+#     font_family = models.CharField(max_length=50)
+#     font_fill = models.CharField(max_length=50)
+#     font_style = models.CharField(max_length=50)
+#     font_size = models.IntegerField(defaut=100)
+#     is_front = models.BooleanField(default=True)
+#     design = models.ForeignKey('Design')
+
 class Profile(models.Model):
     user = models.OneToOneField('auth.User', on_delete=models.CASCADE,primary_key=True)
     user_group = models.OneToOneField(
