@@ -110,14 +110,22 @@ class SaveDesignCase(TestCase):
         data = JSONParser().parse(stream)
         design_id = data['id']
         """save design"""
-        self.client.put('/', {
-            "detail_body": "#232323",
-            "detail_buttons": "#232323",
-            "detail_sleeve": "#232323",
-            "detail_banding": "#232323",
-            "detail_stripes": "#232323",
-            "id": design_id
-        }, 'application/json')
+        # self.client.put(path='/', data={
+        #     "detail_body": "#232323",
+        #     "detail_buttons": "#232323",
+        #     "detail_sleeve": "#232323",
+        #     "detail_banding": "#232323",
+        #     "detail_stripes": "#232323",
+        #     "id": design_id
+        # }, content_type='application/json')
+        design_detail = """{
+            \"detail_body\": \"#232323\",
+            \"detail_buttons\": \"#232323\",
+            \"detail_sleeve\": \"#232323\",
+            \"detail_banding\": \"#232323\",
+            \"detail_stripes\": \"#232323\",
+            \"id\": """+str(design_id)+"}"
+        self.client.put(path='/', data=design_detail, content_type='application/json')
         response = self.client.get('/')
         self.assertEqual(response.status_code//100, 2)
         response.render()
@@ -131,36 +139,47 @@ class SaveDesignCase(TestCase):
         self.assertEquals(Group.objects.get(id=data['group']).group_name, 'user_group_user04')
         self.assertFalse(data['owner']==None)
 
-# class NewDesignCase(TestCase):
-#     def setUp(self):
-#         self.client.post('/users/', {'username': 'user05', 'password': 'pass'})
-#         self.client.login(username='user05',password='pass')
+class NewDesignCase(TestCase):
+    def setUp(self):
+        self.client.post('/users/', {'username': 'user05', 'password': 'pass'})
+        self.client.login(username='user05',password='pass')
+        response = self.client.get('/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        self.design_id = data['id']
+        design_detail="""{
+            \"detail_body\": \"#232323\",
+            \"detail_buttons\": \"#232323\",
+            \"detail_sleeve\": \"#232323\",
+            \"detail_banding\": \"#232323\",
+            \"detail_stripes\": \"#232323\",
+            \"id\": """+str(self.design_id)+"}"
+        self.client.put(path='/', data=design_detail, content_type='application/json')
 
-#     def test_save_design(self):
-#         """get design id"""
-#         response = self.client.get('/')
-#         response.render()
-#         stream = io.BytesIO(response.content)
-#         data = JSONParser().parse(stream)
-#         design_id = data['id']
-#         """save design"""
-#         self.client.put('/', {
-#             "detail_body": "#232323",
-#             "detail_buttons": "#232323",
-#             "detail_sleeve": "#232323",
-#             "detail_banding": "#232323",
-#             "detail_stripes": "#232323",
-#             "id": design_id
-#         }, 'application/json')
-#         response = self.client.get('/')
-#         self.assertEqual(response.status_code//100, 2)
-#         response.render()e
-#         stream = io.BytesIO(response.content)
-#         data = JSONParser().parse(stream)
-#         self.assertEqual(data['detail_sleeve'], '#232323')
-#         self.assertEqual(data['likes'], 0)
-#         self.assertEqual(data['detail_body'], '#232323')
-#         # id, group, owner should not be null for authorized requests
-#         self.assertEquals(data['id'], design_id)
-#         self.assertEquals(Group.objects.get(id=data['group']).group_name, 'user_group_user04')
-#         self.assertFalse(data['owner']==None)
+    def test_new_design(self):
+        response = self.client.delete('/')
+        self.assertEqual(response.status_code//100, 2)
+        
+        """empty design objects have default values"""
+        response = self.client.get('/')
+        self.assertEqual(response.status_code//100, 2)
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        self.assertEqual(data['detail_sleeve'], '#fcfcfc')
+        self.assertEqual(data['detail_body'], '#001c58')
+        # id, group, owner should be null for non-authorized requests
+        self.assertFalse(data['id']==self.design_id)
+
+
+#################### Test Group Page ####################
+
+class CreateGroupCase(TestCase):
+    def setUp(self):
+        self.client.post('/users/', {'username': 'user06', 'password': 'pass'})
+        self.client.login(username='user06',password='pass')
+
+    def test_new_design(self):
+        self.assertEqual(1,1)
+
