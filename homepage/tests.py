@@ -123,8 +123,7 @@ class SaveDesignCase(TestCase):
             "detail_buttons": "#232323",
             "detail_sleeve": "#232323",
             "detail_banding": "#232323",
-            "detail_stripes": "#232323",
-            "id": design_id
+            "detail_stripes": "#232323"
         }
         self.client.put(path='/', data=design_detail, content_type='application/json')
         response = self.client.get('/')
