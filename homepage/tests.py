@@ -118,13 +118,14 @@ class SaveDesignCase(TestCase):
         #     "detail_stripes": "#232323",
         #     "id": design_id
         # }, content_type='application/json')
-        design_detail = {
-            "detail_body": "#232323",
-            "detail_buttons": "#232323",
-            "detail_sleeve": "#232323",
-            "detail_banding": "#232323",
-            "detail_stripes": "#232323"
-        }
+        design_detail = """{
+            \"detail_body\": \"#232323\",
+            \"detail_buttons\": \"#232323\",
+            \"detail_sleeve\": \"#232323\",
+            \"detail_banding\": \"#232323\",
+            \"detail_stripes\": \"#232323\",
+            \"id\": 1
+        }"""
         self.client.put(path='/', data=design_detail, content_type='application/json')
         response = self.client.get('/')
         self.assertEqual(response.status_code//100, 2)
@@ -148,14 +149,14 @@ class NewDesignCase(TestCase):
         stream = io.BytesIO(response.content)
         data = JSONParser().parse(stream)
         self.design_id = data['id']
-        design_detail = {
-            "detail_body": "#232323",
-            "detail_buttons": "#232323",
-            "detail_sleeve": "#232323",
-            "detail_banding": "#232323",
-            "detail_stripes": "#232323",
-            "id": self.design_id
-        }
+        design_detail="""{
+            \"detail_body\": \"#232323\",
+            \"detail_buttons\": \"#232323\",
+            \"detail_sleeve\": \"#232323\",
+            \"detail_banding\": \"#232323\",
+            \"detail_stripes\": \"#232323\",
+            \"id\": 1
+        }"""
         self.client.put(path='/', data=design_detail, content_type='application/json')
 
     def test_new_design(self):
