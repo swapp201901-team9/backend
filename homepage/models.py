@@ -50,23 +50,23 @@ class Design(models.Model):
     who = models.ManyToManyField('auth.User', related_name="who", blank=True)
     detail_body = models.CharField(
         max_length=7,
-        default="#ffffff",
+        default="#001c58",
     )
     detail_buttons = models.CharField(
         max_length=7,
-        default="#ffffff",
+        default="#fcfcfc",
     )
     detail_sleeve = models.CharField(
         max_length=7,
-        default="#ffffff",
+        default="#fcfcfc",
     )
     detail_banding = models.CharField(
         max_length=7,
-        default="#ffffff",
+        default="#001c58",
     )
     detail_stripes = models.CharField(
         max_length=7,
-        default="#ffffff",
+        default="#fcfcfc",
     )
 
     def __str__(self):
