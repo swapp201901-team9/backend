@@ -9,6 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.parsers import JSONParser
 # from .forms import DesignForm, GroupForm
 from .models import *
 from .serializers import *
@@ -161,7 +162,7 @@ def main(request):
     
     # saves design to user group
     if request.method == 'PUT':
-        data = json.loads(request.body.decode("utf-8"))
+        data = json.loads(request.body.decode("utf-8")) 
         design_id=data['id']
         if design_id != user.recent.id:
             return Response(status=status.HTTP_400_BAD_REQUEST)
