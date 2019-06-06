@@ -70,27 +70,55 @@ class GroupSerializer(serializers.ModelSerializer):
         model = Group
         fields = '__all__'
 
-class UserDesignSerializer(serializers.ModelSerializer):
-    '''
-    def create(self, validated_data):
-        profile_data = validated_data.pop('profile', None)
-        user = super(UserSerializer, self).create(validated_data)
-        self.update_or_create_profile(user, profile_data)
-        return user
-    '''
-    '''
-    def update(self, instance, validated_data):
-        instance.set_password(validated_data['password'])
-        instance.save()
-        return instance
-    '''
-    '''
-    def update_or_create_profile(self, user, profile_data):
-        Profile.objects.update_or_create(user=user, defaults=profile_data)
-    '''
+class TextSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Text
+        fields = '__all__'
+
+class UserDesignSerializer(serializers.ModelSerializer):    
+    front_chest = serializers.SerializerMethodField()
+    left_arm = serializers.SerializerMethodField()
+    right_arm = serializers.SerializerMethodField()
+    upper_back = serializers.SerializerMethodField()
+    middle_back = serializers.SerializerMethodField()
+    lower_back = serializers.SerializerMethodField()
+
+    def get_front_chest(self, obj):
+        if obj.front_chest_text == None:
+            return None
+        return TextSerializer(obj.front_chest_text).data
+    
+    def get_left_arm(self, obj):
+        if obj.left_arm_text == None:
+            return None
+        return TextSerializer(obj.left_arm_text).data
+    
+    def get_right_arm(self, obj):
+        if obj.right_arm_text == None:
+            return None
+        return TextSerializer(obj.right_arm_text).data
+    
+    def get_upper_back(self, obj):
+        if obj.upper_back_text == None:
+            return None
+        return TextSerializer(obj.upper_back_text).data
+    
+    def get_middle_back(self, obj):
+        if obj.middle_back_text == None:
+            return None
+        return TextSerializer(obj.middle_back_text).data
+    
+    def get_lower_back(self, obj):
+        if obj.lower_back_text == None:
+            return None
+        return TextSerializer(obj.lower_back_text).data
+
     class Meta:
         model = Design
-        fields = '__all__'
+        fields = ('id', 'group', 'likes', 
+            'detail_body', 'detail_buttons', 'detail_sleeve', 'detail_banding', 'detail_stripes',
+            'front_chest', 'left_arm', 'right_arm', 'upper_back', 'middle_back', 'lower_back'
+        )
 
 class GroupDesignSerializer(serializers.ModelSerializer):
     auth = serializers.SerializerMethodField()

@@ -68,18 +68,22 @@ class Design(models.Model):
         max_length=7,
         default="#fcfcfc",
     )
+    front_chest_text = models.OneToOneField('Text', related_name='front_chest', null=True, blank=True, on_delete=models.CASCADE)
+    left_arm_text = models.OneToOneField('Text', related_name='left_arm', null=True, blank=True, on_delete=models.CASCADE)
+    right_arm_text = models.OneToOneField('Text', related_name='right_arm', null=True, blank=True, on_delete=models.CASCADE)
+    upper_back_text = models.OneToOneField('Text', related_name='upper_back', null=True, blank=True, on_delete=models.CASCADE)
+    middle_back_text = models.OneToOneField('Text', related_name='middle_back', null=True, blank=True, on_delete=models.CASCADE)
+    lower_back_text = models.OneToOneField('Text', related_name='lower_back', null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.group)+'_'+str(self.owner)+"_"+str(self.id)
 
-# class Text(models.Model):
-#     text_value = models.CharField(max_length=50)
-#     font_family = models.CharField(max_length=50)
-#     font_fill = models.CharField(max_length=50)
-#     font_style = models.CharField(max_length=50)
-#     font_size = models.IntegerField(defaut=100)
-#     is_front = models.BooleanField(default=True)
-#     design = models.ForeignKey('Design')
+class Text(models.Model):
+    text_value = models.CharField(max_length=50)
+    font_family = models.CharField(max_length=50)
+    font_fill = models.CharField(max_length=50)
+    font_style = models.CharField(max_length=50)
+    font_size = models.IntegerField(default=100)
 
 class Profile(models.Model):
     user = models.OneToOneField('auth.User', on_delete=models.CASCADE,primary_key=True)
