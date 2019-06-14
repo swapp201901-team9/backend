@@ -50,27 +50,36 @@ class Design(models.Model):
     who = models.ManyToManyField('auth.User', related_name="who", blank=True)
     detail_body = models.CharField(
         max_length=7,
-        default="#ffffff",
+        default="#001c58",
     )
     detail_buttons = models.CharField(
         max_length=7,
-        default="#ffffff",
+        default="#fcfcfc",
     )
     detail_sleeve = models.CharField(
         max_length=7,
-        default="#ffffff",
+        default="#fcfcfc",
     )
     detail_banding = models.CharField(
         max_length=7,
-        default="#ffffff",
+        default="#001c58",
     )
     detail_stripes = models.CharField(
         max_length=7,
-        default="#ffffff",
+        default="#fcfcfc",
     )
 
     def __str__(self):
         return str(self.group)+'_'+str(self.owner)+"_"+str(self.id)
+
+# class Text(models.Model):
+#     text_value = models.CharField(max_length=50)
+#     font_family = models.CharField(max_length=50)
+#     font_fill = models.CharField(max_length=50)
+#     font_style = models.CharField(max_length=50)
+#     font_size = models.IntegerField(defaut=100)
+#     is_front = models.BooleanField(default=True)
+#     design = models.ForeignKey('Design')
 
 class Profile(models.Model):
     user = models.OneToOneField('auth.User', on_delete=models.CASCADE,primary_key=True)
