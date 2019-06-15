@@ -592,6 +592,28 @@ def group_list_all(request):
         group_serializer = GroupSerializer(instance=groups, user=request.user, many=True)
         return Response(group_serializer.data)
 
+@api_view(['GET'])
+@permission_classes((IsAuthenticatedOrNothing,))
+def edit_design(request, design_id):
+    try:
+        user = Profile.objects.get(user=request.user)
+    except Profile.DoesNotExist:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+    try:
+        design = Design.objects.get(id=design_id)
+    except Design.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if request.user != design.owner:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    if design.group.group_type != 'UR' or request.user not in design.group.master.all():
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    
+    user.recent = design
+    user.save()
+    profile_serializer = ProfileSerializer(user)
+    return Response(profile_serializer.data)
+
 @csrf_exempt
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes((IsAuthenticatedOrNothing,))
