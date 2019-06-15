@@ -19,3 +19,9 @@ class IsAuthenticatedOrNothing(permissions.BasePermission):
 class NoAuthenticationRequired(permissions.BasePermission):
     def has_permission(self, request, view):
         return True
+
+class IsAuthenticatedOrGETDELETEOnly(permissions.BasePermission):
+     def has_permission(self, request, view):
+        if request.method == 'GET' or request.method == 'DELETE':
+            return True
+        return request.user.is_authenticated
