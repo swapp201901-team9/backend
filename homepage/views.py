@@ -128,7 +128,7 @@ def profile(request, username):
         return Response(status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_403_FORBIDDEN)
 
-def set_default_text(design):
+def set_default_text_and_logo(design):
     if design.front_chest_text == None:
         frontchest = Text()
         frontchest.textvalue = "S"
@@ -139,7 +139,7 @@ def set_default_text(design):
         frontchest.left = 250
         frontchest.top = 110
         frontchest.stroke = "#000000"
-        frontchest.strokeWidth = 2
+        frontchest.strokewidth = 2
         design.front_chest_text = frontchest
     
     if design.right_arm_text == None:
@@ -152,7 +152,7 @@ def set_default_text(design):
         rightarm.left = 50
         rightarm.top = 120
         rightarm.stroke = ""
-        rightarm.strokeWidth = 0
+        rightarm.strokewidth = 0
         design.right_arm_text = rightarm
 
     if design.upper_back_text == None:
@@ -165,7 +165,7 @@ def set_default_text(design):
         upperback.left = 135
         upperback.top = 125
         upperback.stroke = ""
-        upperback.strokeWidth = 0
+        upperback.strokewidth = 0
         design.upper_back_text = upperback
 
     if design.middle_back_text == None:
@@ -178,7 +178,7 @@ def set_default_text(design):
         middleback.left = 155
         middleback.top = 155
         middleback.stroke = ""
-        middleback.strokeWidth = 0
+        middleback.strokewidth = 0
         design.middle_back_text = middleback
 
     if design.lower_back_text == None:
@@ -191,8 +191,194 @@ def set_default_text(design):
         lowerback.left = 150
         lowerback.top = 190
         lowerback.stroke = ""
-        lowerback.strokeWidth = 0
+        lowerback.strokewidth = 0
         design.lower_back_text = lowerback
+
+    if design.front_logo == None:
+        frontlogo = Logo()
+        frontlogo.left = 340
+        frontlogo.top = 180
+        design.front_logo = frontlogo
+
+    if design.back_logo == None:
+        backlogo = Logo()
+        backlogo.left = 215
+        backlogo.top = 280
+        design.back_logo = backlogo
+
+def update_text_and_logo(text, logo, design):
+    if design.front_chest_text != None:
+        design.front_chest_text.delete()
+    frontchest = Text()
+    frontchest.textvalue = text['frontchest']['textvalue']
+    frontchest.fontFamily = text['frontchest']['fontFamily']
+    frontchest.fill = text['frontchest']['fill']
+    frontchest.fontStyle = text['frontchest']['fontStyle']
+    frontchest.fontSize = text['frontchest']['fontSize']
+    frontchest.left = text['frontchest']['left']
+    frontchest.top = text['frontchest']['top']
+    frontchest.stroke = text['frontchest']['stroke']
+    frontchest.strokewidth = text['frontchest']['strokewidth']
+    frontchest.save()
+    design.front_chest_text = frontchest
+    
+    if design.right_arm_text != None:
+        design.right_arm_text.delete()
+    rightarm = Text()
+    rightarm.textvalue = text['rightarm']['textvalue']
+    rightarm.fontFamily = text['rightarm']['fontFamily']
+    rightarm.fill = text['rightarm']['fill']
+    rightarm.fontStyle = text['rightarm']['fontStyle']
+    rightarm.fontSize = text['rightarm']['fontSize']
+    rightarm.left = text['rightarm']['left']
+    rightarm.top = text['rightarm']['top']
+    rightarm.stroke = text['rightarm']['stroke']
+    rightarm.strokewidth = text['rightarm']['strokewidth']
+    rightarm.save()
+    design.right_arm_text = rightarm
+
+    if design.upper_back_text != None:
+        design.upper_back_text.delete()
+    upperback = Text()
+    upperback.textvalue = text['upperback']['textvalue']
+    upperback.fontFamily = text['upperback']['fontFamily']
+    upperback.fill = text['upperback']['fill']
+    upperback.fontStyle = text['upperback']['fontStyle']
+    upperback.fontSize = text['upperback']['fontSize']
+    upperback.left = text['upperback']['left']
+    upperback.top = text['upperback']['top']
+    upperback.stroke = text['upperback']['stroke']
+    upperback.strokewidth = text['upperback']['strokewidth']
+    upperback.save()
+    design.upper_back_text = upperback
+
+    if design.middle_back_text != None:
+        design.middle_back_text.delete()
+    middleback = Text()
+    middleback.textvalue = text['middleback']['textvalue']
+    middleback.fontFamily = text['middleback']['fontFamily']
+    middleback.fill = text['middleback']['fill']
+    middleback.fontStyle = text['middleback']['fontStyle']
+    middleback.fontSize = text['middleback']['fontSize']
+    middleback.left = text['middleback']['left']
+    middleback.top = text['middleback']['top']
+    middleback.stroke = text['middleback']['stroke']
+    middleback.strokewidth = text['middleback']['strokewidth']
+    middleback.save()
+    design.middle_back_text = middleback
+
+    if design.lower_back_text != None:
+        design.lower_back_text.delete()
+    lowerback = Text()
+    lowerback.textvalue = text['lowerback']['textvalue']
+    lowerback.fontFamily = text['lowerback']['fontFamily']
+    lowerback.fill = text['lowerback']['fill']
+    lowerback.fontStyle = text['lowerback']['fontStyle']
+    lowerback.fontSize = text['lowerback']['fontSize']
+    lowerback.left = text['lowerback']['left']
+    lowerback.top = text['lowerback']['top']
+    lowerback.stroke = text['lowerback']['stroke']
+    lowerback.strokewidth = text['lowerback']['strokewidth']
+    lowerback.save()
+    design.lower_back_text = lowerback
+
+    if design.front_logo != None:
+        design.front_logo.delete()
+    frontlogo = Logo()
+    frontlogo.src = logo['front']['src']
+    frontlogo.left = logo['front']['left']
+    frontlogo.top = logo['front']['top']
+    frontlogo.save()
+    design.front_logo = frontlogo
+
+    if design.back_logo != None:
+        design.back_logo.delete()
+    backlogo = Logo()
+    backlogo.src = logo['back']['src']
+    backlogo.left = logo['back']['left']
+    backlogo.top = logo['back']['top']
+    backlogo.save()
+    design.back_logo = backlogo
+
+def copy_text_and_logo(post_design, design):
+    frontchest = Text()
+    frontchest.textvalue = design.front_chest_text.textvalue
+    frontchest.fontFamily = design.front_chest_text.fontFamily
+    frontchest.fill = design.front_chest_text.fill
+    frontchest.fontStyle = design.front_chest_text.fontStyle
+    frontchest.fontSize = design.front_chest_text.fontSize
+    frontchest.left = design.front_chest_text.left
+    frontchest.top = design.front_chest_text.top
+    frontchest.stroke = design.front_chest_text.stroke
+    frontchest.strokewidth = design.front_chest_text.strokewidth
+    frontchest.save()
+    post_design.front_chest_text = frontchest
+    
+    rightarm = Text()
+    rightarm.textvalue = design.right_arm_text.textvalue
+    rightarm.fontFamily = design.right_arm_text.fontFamily
+    rightarm.fill = design.right_arm_text.fill
+    rightarm.fontStyle = design.right_arm_text.fontStyle
+    rightarm.fontSize = design.right_arm_text.fontSize
+    rightarm.left = design.right_arm_text.left
+    rightarm.top = design.right_arm_text.top
+    rightarm.stroke = design.right_arm_text.stroke
+    rightarm.strokewidth = design.right_arm_text.strokewidth
+    rightarm.save()
+    post_design.right_arm_text = rightarm
+
+    upperback = Text()
+    upperback.textvalue = design.upper_back_text.textvalue
+    upperback.fontFamily = design.upper_back_text.fontFamily
+    upperback.fill = design.upper_back_text.fill
+    upperback.fontStyle = design.upper_back_text.fontStyle
+    upperback.fontSize = design.upper_back_text.fontSize
+    upperback.left = design.upper_back_text.left
+    upperback.top = design.upper_back_text.top
+    upperback.stroke = design.upper_back_text.stroke
+    upperback.strokewidth = design.upper_back_text.strokewidth
+    upperback.save()
+    post_design.upper_back_text = upperback
+
+    middleback = Text()
+    middleback.textvalue = design.middle_back_text.textvalue
+    middleback.fontFamily = design.middle_back_text.fontFamily
+    middleback.fill = design.middle_back_text.fill
+    middleback.fontStyle = design.middle_back_text.fontStyle
+    middleback.fontSize = design.middle_back_text.fontSize
+    middleback.left = design.middle_back_text.left
+    middleback.top = design.middle_back_text.top
+    middleback.stroke = design.middle_back_text.stroke
+    middleback.strokewidth = design.middle_back_text.strokewidth
+    middleback.save()
+    post_design.middle_back_text = middleback
+
+    lowerback = Text()
+    lowerback.textvalue = design.lower_back_text.textvalue
+    lowerback.fontFamily = design.lower_back_text.fontFamily
+    lowerback.fill = design.lower_back_text.fill
+    lowerback.fontStyle = design.lower_back_text.fontStyle
+    lowerback.fontSize = design.lower_back_text.fontSize
+    lowerback.left = design.lower_back_text.left
+    lowerback.top = design.lower_back_text.top
+    lowerback.stroke = design.lower_back_text.stroke
+    lowerback.strokewidth = design.lower_back_text.strokewidth
+    lowerback.save()
+    post_design.lower_back_text = lowerback
+
+    frontlogo = Logo()
+    frontlogo.src = design.front_logo.src
+    frontlogo.left = design.front_logo.left
+    frontlogo.src = design.front_logo.src
+    frontlogo.save()
+    post_design.front_logo = frontlogo
+
+    backlogo = Logo()
+    backlogo.src = design.back_logo.src
+    backlogo.left = design.back_logo.left
+    backlogo.src = design.back_logo.src
+    backlogo.save()
+    post_design.back_logo = backlogo
 
 @csrf_exempt
 @api_view(['GET', 'PUT', 'DELETE'])
@@ -217,7 +403,7 @@ def main(request):
                 design.save()
                 user.recent = design
                 user.save()
-        set_default_text(design)
+        set_default_text_and_logo(design)
         design_serializer = UserDesignSerializer(design)
         return Response(design_serializer.data)
     
@@ -232,11 +418,16 @@ def main(request):
         design_id=data['id']
         if design_id != user.recent.id:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        user.recent.body=data['detail_body']
-        user.recent.sleeve=data['detail_sleeve']
-        user.recent.button=data['detail_buttons']
-        user.recent.banding=data['detail_banding']
-        user.recent.stripe=data['detail_stripes']
+        user.recent.body=data['design']['body']
+        user.recent.sleeve=data['design']['sleeve']
+        user.recent.button=data['design']['button']
+        user.recent.banding=data['design']['banding']
+        user.recent.stripe=data['design']['stripe']
+        update_text_and_logo(data['text'], data['logo'], user.recent)
+        user.recent.front_logo_url=data['logo']['front']
+        user.recent.back_logo_url=data['logo']['back']
+        user.recent.front_image_url=data['image']['front']
+        user.recent.back_image_url=data['image']['back']
         user.recent.save()
         design_serializer = UserDesignSerializer(user.recent)
         return Response(design_serializer.data)
@@ -259,7 +450,7 @@ def main(request):
             user.recent = design
             user.save()
             
-        set_default_text(design)
+        set_default_text_and_logo(design)
         design_serializer = UserDesignSerializer(design)
         return Response(design_serializer.data)
 
@@ -315,11 +506,14 @@ def post_design(request, group_id, design_id):
         post_design=Design()
         post_design.owner = request.user
         post_design.group = group
-        post_design.body = design.detail_body
-        post_design.sleeve = design.detail_sleeve
-        post_design.button = design.detail_buttons
-        post_design.banding = design.detail_banding
-        post_design.stripe = design.detail_stripes
+        post_design.body = design.body
+        post_design.sleeve = design.sleeve
+        post_design.button = design.button
+        post_design.banding = design.banding
+        post_design.stripe = design.stripe
+        copy_text_and_logo(post_design, design)
+        post_design.front_image_url = design.front_image_url
+        post_design.back_image_url = design.back_image_url
         post_design.save()
 
         design_serializer = UserDesignSerializer(post_design)
@@ -439,6 +633,28 @@ def group_list_all(request):
             return Response(status=status.HTTP_404_NOT_FOUND)
         group_serializer = GroupSerializer(instance=groups, user=request.user, many=True)
         return Response(group_serializer.data)
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticatedOrNothing,))
+def edit_design(request, design_id):
+    try:
+        user = Profile.objects.get(user=request.user)
+    except Profile.DoesNotExist:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+    try:
+        design = Design.objects.get(id=design_id)
+    except Design.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if request.user != design.owner:
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    if design.group.group_type != 'UR' or request.user not in design.group.master.all():
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    
+    user.recent = design
+    user.save()
+    profile_serializer = ProfileSerializer(user)
+    return Response(profile_serializer.data)
 
 @csrf_exempt
 @api_view(['GET', 'PUT', 'DELETE'])

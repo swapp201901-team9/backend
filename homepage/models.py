@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import signals
 from django.contrib.auth.models import User
+from .default_logo import DEFAULT_LOGO_BASE64
 import base64
 
 # BLACK = 'BK'
@@ -73,12 +74,19 @@ class Design(models.Model):
     upper_back_text = models.OneToOneField('Text', related_name='upper_back', null=True, blank=True, on_delete=models.SET_NULL)
     middle_back_text = models.OneToOneField('Text', related_name='middle_back', null=True, blank=True, on_delete=models.SET_NULL)
     lower_back_text = models.OneToOneField('Text', related_name='lower_back', null=True, blank=True, on_delete=models.SET_NULL)
+    front_logo = models.OneToOneField('Logo', related_name='front_logo', null=True, blank=True, on_delete=models.SET_NULL)
+    back_logo = models.OneToOneField('Logo', related_name='back_logo', null=True, blank=True, on_delete=models.SET_NULL)
 
-    front_image_url = models.CharField(max_length=100, blank=True, null=True)
-    back_image_url = models.CharField(max_length=100, blank=True, null=True)
+    front_image_url = models.TextField(blank=True, null=True)
+    back_image_url = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return str(self.group)+'_'+str(self.owner)+"_"+str(self.id)
+
+class Logo(models.Model):
+    src = models.TextField(default=DEFAULT_LOGO_BASE64, blank=True, null=True)
+    left = models.IntegerField(default=0)
+    top = models.IntegerField(default=0)
 
 class Text(models.Model):
     textvalue = models.CharField(max_length=50)
