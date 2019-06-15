@@ -130,7 +130,7 @@ def profile(request, username):
 
 @csrf_exempt
 @api_view(['GET', 'PUT', 'DELETE'])
-@permission_classes((IsAuthenticatedOrGETOnly,))
+@permission_classes((IsAuthenticatedOrGETDELETEOnly,))
 def main(request):    
     if request.method == 'GET':
         # check if user is logged in
@@ -154,14 +154,13 @@ def main(request):
         design_serializer = UserDesignSerializer(design)
         return Response(design_serializer.data)
     
-    # for the rest of the methods
-    try:
-        user = Profile.objects.get(user=request.user)
-    except Profile.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)    
-    
     # saves design to user group
     if request.method == 'PUT':
+        try:
+            user = Profile.objects.get(user=request.user)
+        except Profile.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)    
+
         data = json.loads(request.body.decode("utf-8")) 
         design_id=data['id']
         if design_id != user.recent.id:
@@ -178,12 +177,20 @@ def main(request):
     # doesn't really delete design but saves it in user group
     # needs to be deleted in user group detail
     if request.method == 'DELETE':
-        design = Design()
-        design.owner = request.user
-        design.group = user.user_group
-        design.save()
-        user.recent = design
-        user.save()
+        if request.user.id == None: 
+            design = Design()
+        else:    
+            try:
+                user = Profile.objects.get(user=request.user)
+            except Profile.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            
+            design = Design()
+            design.owner = request.user
+            design.group = user.user_group
+            design.save()
+            user.recent = design
+            user.save()
         
         design_serializer = UserDesignSerializer(design)
         return Response(design_serializer.data)
