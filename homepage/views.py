@@ -128,6 +128,68 @@ def profile(request, username):
         return Response(status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_403_FORBIDDEN)
 
+def set_default_text(design):
+    frontchest = Text()
+    frontchest.textvalue = "S"
+    frontchest.fontFamily = "arial"
+    frontchest.fill = "#3f51b5"
+    frontchest.fontStyle = "bold"
+    frontchest.fontSize = 50
+    frontchest.left = 250
+    frontchest.top = 110
+    frontchest.stroke = "#000000"
+    frontchest.strokeWidth = 2
+    
+    rightarm = Text()
+    rightarm.textvalue = "19"
+    rightarm.fontFamily = "arial"
+    rightarm.fill = "#607d8b"
+    rightarm.fontStyle = "bold"
+    rightarm.fontSize = 50
+    rightarm.left = 50
+    rightarm.top = 120
+    rightarm.stroke = ""
+    rightarm.strokeWidth = 0
+
+    upperback = Text()
+    upperback.textvalue = "SEOUL NAT'L"
+    upperback.fontFamily = "arial"
+    upperback.fill = "#ffc107"
+    upperback.fontStyle = "bold"
+    upperback.fontSize = 25
+    upperback.left = 135
+    upperback.top = 125
+    upperback.stroke = ""
+    upperback.strokeWidth = 0
+    
+    middleback = Text()
+    middleback.textvalue = "UNIVERSITY"
+    middleback.fontFamily = "arial"
+    middleback.fill = "#ffc107"
+    middleback.fontStyle = "bold"
+    middleback.fontSize = 20
+    middleback.left = 155
+    middleback.top = 155
+    middleback.stroke = ""
+    middleback.strokeWidth = 0
+    
+    lowerback = Text()
+    lowerback.textvalue = "UNIVERSITY"
+    lowerback.fontFamily = "arial"
+    lowerback.fill = "#ffc107"
+    lowerback.fontStyle = "bold"
+    lowerback.fontSize = 15
+    lowerback.left = 150
+    lowerback.top = 190
+    lowerback.stroke = ""
+    lowerback.strokeWidth = 0
+
+    design.front_chest_text = frontchest
+    design.right_arm_text = rightarm
+    design.upper_back_text = upperback
+    design.middle_back_text = middleback
+    design.lower_back_text = lowerback
+
 @csrf_exempt
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes((IsAuthenticatedOrGETDELETEOnly,))
@@ -136,6 +198,7 @@ def main(request):
         # check if user is logged in
         if request.user.id == None: 
             design = Design()
+            set_default_text(design)
         else:
             try:
                 user = Profile.objects.get(user=request.user)
@@ -151,6 +214,7 @@ def main(request):
                 design.save()
                 user.recent = design
                 user.save()
+                set_default_text(design)
         design_serializer = UserDesignSerializer(design)
         return Response(design_serializer.data)
     
@@ -179,6 +243,7 @@ def main(request):
     if request.method == 'DELETE':
         if request.user.id == None: 
             design = Design()
+            set_default_text(design)
         else:    
             try:
                 user = Profile.objects.get(user=request.user)
@@ -191,6 +256,7 @@ def main(request):
             design.save()
             user.recent = design
             user.save()
+            set_default_text(design)
         
         design_serializer = UserDesignSerializer(design)
         return Response(design_serializer.data)
