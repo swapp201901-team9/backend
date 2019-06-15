@@ -80,6 +80,11 @@ class TextSerializer(serializers.ModelSerializer):
         model = Text
         fields = '__all__'
 
+class LogoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Logo
+        fields = '__all__'
+
 class DesignDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Design
@@ -126,10 +131,14 @@ class DesignLogoSerializer(serializers.ModelSerializer):
     back = serializers.SerializerMethodField()
 
     def get_front(self, obj):
-        return obj.front_logo_url
+        if obj.front_logo == None:
+            return None
+        return LogoSerializer(obj.front_logo).data
 
     def get_back(self, obj):
-        return obj.back_logo_url
+        if obj.back_logo == None:
+            return None
+        return LogoSerializer(obj.back_logo).data
 
     class Meta:
         model = Design

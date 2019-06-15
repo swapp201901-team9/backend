@@ -128,7 +128,7 @@ def profile(request, username):
         return Response(status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_403_FORBIDDEN)
 
-def set_default_text(design):
+def set_default_text_and_logo(design):
     if design.front_chest_text == None:
         frontchest = Text()
         frontchest.textvalue = "S"
@@ -194,7 +194,19 @@ def set_default_text(design):
         lowerback.strokewidth = 0
         design.lower_back_text = lowerback
 
-def update_text(text, design):
+    if design.front_logo == None:
+        frontlogo = Logo()
+        frontlogo.left = 340
+        frontlogo.top = 180
+        design.front_logo = frontlogo
+
+    if design.back_logo == None:
+        backlogo = Logo()
+        backlogo.left = 215
+        backlogo.top = 280
+        design.back_logo = backlogo
+
+def update_text_and_logo(text, logo, design):
     if design.front_chest_text != None:
         design.front_chest_text.delete()
     frontchest = Text()
@@ -270,7 +282,25 @@ def update_text(text, design):
     lowerback.save()
     design.lower_back_text = lowerback
 
-def copy_text(post_design, design):
+    if design.front_logo != None:
+        design.front_logo.delete()
+    frontlogo = Logo()
+    frontlogo.src = logo['front']['src']
+    frontlogo.left = logo['front']['left']
+    frontlogo.top = logo['front']['top']
+    frontlogo.save()
+    design.front_logo = frontlogo
+
+    if design.back_logo != None:
+        design.back_logo.delete()
+    backlogo = Logo()
+    backlogo.src = logo['back']['src']
+    backlogo.left = logo['back']['left']
+    backlogo.top = logo['back']['top']
+    backlogo.save()
+    design.back_logo = backlogo
+
+def copy_text_and_logo(post_design, design):
     frontchest = Text()
     frontchest.textvalue = design.front_chest_text.textvalue
     frontchest.fontFamily = design.front_chest_text.fontFamily
@@ -336,6 +366,20 @@ def copy_text(post_design, design):
     lowerback.save()
     post_design.lower_back_text = lowerback
 
+    frontlogo = Logo()
+    frontlogo.src = design.front_logo.src
+    frontlogo.left = design.front_logo.left
+    frontlogo.src = design.front_logo.src
+    frontlogo.save()
+    post_design.front_logo = frontlogo
+
+    backlogo = Logo()
+    backlogo.src = design.back_logo.src
+    backlogo.left = design.back_logo.left
+    backlogo.src = design.back_logo.src
+    backlogo.save()
+    post_design.back_logo = backlogo
+
 @csrf_exempt
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes((IsAuthenticatedOrGETDELETEOnly,))
@@ -359,7 +403,7 @@ def main(request):
                 design.save()
                 user.recent = design
                 user.save()
-        set_default_text(design)
+        set_default_text_and_logo(design)
         design_serializer = UserDesignSerializer(design)
         return Response(design_serializer.data)
     
@@ -379,7 +423,7 @@ def main(request):
         user.recent.button=data['design']['button']
         user.recent.banding=data['design']['banding']
         user.recent.stripe=data['design']['stripe']
-        update_text(data['text'], user.recent)
+        update_text_and_logo(data['text'], data['logo'], user.recent)
         user.recent.front_logo_url=data['logo']['front']
         user.recent.back_logo_url=data['logo']['back']
         user.recent.front_image_url=data['image']['front']
@@ -406,7 +450,7 @@ def main(request):
             user.recent = design
             user.save()
             
-        set_default_text(design)
+        set_default_text_and_logo(design)
         design_serializer = UserDesignSerializer(design)
         return Response(design_serializer.data)
 
@@ -467,11 +511,9 @@ def post_design(request, group_id, design_id):
         post_design.button = design.button
         post_design.banding = design.banding
         post_design.stripe = design.stripe
-        copy_text(post_design, design)
+        copy_text_and_logo(post_design, design)
         post_design.front_image_url = design.front_image_url
         post_design.back_image_url = design.back_image_url
-        post_design.front_logo_url = design.front_logo_url
-        post_design.back_logo_url = design.back_logo_url
         post_design.save()
 
         design_serializer = UserDesignSerializer(post_design)
