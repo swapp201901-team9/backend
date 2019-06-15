@@ -424,8 +424,8 @@ def main(request):
         user.recent.banding=data['design']['banding']
         user.recent.stripe=data['design']['stripe']
         update_text_and_logo(data['text'], data['logo'], user.recent)
-        user.recent.front_image_url=data['image']['front']
-        user.recent.back_image_url=data['image']['back']
+        user.recent.front_image_url=data['image']['frontImg']
+        user.recent.back_image_url=data['image']['backImg']
         user.recent.save()
         design_serializer = UserDesignSerializer(user.recent)
         return Response(design_serializer.data)

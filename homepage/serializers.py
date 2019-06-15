@@ -145,18 +145,18 @@ class DesignLogoSerializer(serializers.ModelSerializer):
         fields = ('front', 'back')
 
 class DesignImageSerializer(serializers.ModelSerializer):
-    front = serializers.SerializerMethodField()
-    back = serializers.SerializerMethodField()
+    frontImg = serializers.SerializerMethodField()
+    backImg = serializers.SerializerMethodField()
 
-    def get_front(self, obj):
+    def get_frontImg(self, obj):
         return obj.front_image_url
 
-    def get_back(self, obj):
+    def get_backImg(self, obj):
         return obj.back_image_url
 
     class Meta:
         model = Design
-        fields = ('front', 'back')
+        fields = ('frontImg', 'backImg')
 
 class UserDesignSerializer(serializers.ModelSerializer):    
     design = serializers.SerializerMethodField()
