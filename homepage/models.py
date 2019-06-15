@@ -48,42 +48,51 @@ class Design(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     likes = models.IntegerField(default=0)
     who = models.ManyToManyField('auth.User', related_name="who", blank=True)
-    detail_body = models.CharField(
+    body = models.CharField(
         max_length=7,
         default="#001c58",
     )
-    detail_buttons = models.CharField(
+    button = models.CharField(
         max_length=7,
         default="#fcfcfc",
     )
-    detail_sleeve = models.CharField(
+    sleeve = models.CharField(
         max_length=7,
         default="#fcfcfc",
     )
-    detail_banding = models.CharField(
+    banding = models.CharField(
         max_length=7,
         default="#001c58",
     )
-    detail_stripes = models.CharField(
+    stripe = models.CharField(
         max_length=7,
         default="#fcfcfc",
     )
     front_chest_text = models.OneToOneField('Text', related_name='front_chest', null=True, blank=True, on_delete=models.CASCADE)
-    left_arm_text = models.OneToOneField('Text', related_name='left_arm', null=True, blank=True, on_delete=models.CASCADE)
     right_arm_text = models.OneToOneField('Text', related_name='right_arm', null=True, blank=True, on_delete=models.CASCADE)
     upper_back_text = models.OneToOneField('Text', related_name='upper_back', null=True, blank=True, on_delete=models.CASCADE)
     middle_back_text = models.OneToOneField('Text', related_name='middle_back', null=True, blank=True, on_delete=models.CASCADE)
     lower_back_text = models.OneToOneField('Text', related_name='lower_back', null=True, blank=True, on_delete=models.CASCADE)
 
+    front_image_url = models.CharField(max_length=100, null=True)
+    back_image_url = models.CharField(max_length=100, null=True)
+
     def __str__(self):
         return str(self.group)+'_'+str(self.owner)+"_"+str(self.id)
 
 class Text(models.Model):
-    text_value = models.CharField(max_length=50)
-    font_family = models.CharField(max_length=50)
-    font_fill = models.CharField(max_length=50)
-    font_style = models.CharField(max_length=50)
-    font_size = models.IntegerField(default=100)
+    textvalue = models.CharField(max_length=50)
+    fontFamily = models.CharField(max_length=50)
+    fill = models.CharField(max_length=50)
+    fontStyle = models.CharField(max_length=50)
+    fontSize = models.IntegerField(default=100)
+    left = models.IntegerField(default=0)
+    top = models.IntegerField(default=0)
+    stroke = models.CharField(
+        max_length=7,
+        default="#fcfcfc",
+    )
+    strokewidth = models.IntegerField(default=0)
 
 class Profile(models.Model):
     user = models.OneToOneField('auth.User', on_delete=models.CASCADE,primary_key=True)
