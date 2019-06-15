@@ -68,14 +68,14 @@ class Design(models.Model):
         max_length=7,
         default="#fcfcfc",
     )
-    front_chest_text = models.OneToOneField('Text', related_name='front_chest', null=True, blank=True, on_delete=models.CASCADE)
-    right_arm_text = models.OneToOneField('Text', related_name='right_arm', null=True, blank=True, on_delete=models.CASCADE)
-    upper_back_text = models.OneToOneField('Text', related_name='upper_back', null=True, blank=True, on_delete=models.CASCADE)
-    middle_back_text = models.OneToOneField('Text', related_name='middle_back', null=True, blank=True, on_delete=models.CASCADE)
-    lower_back_text = models.OneToOneField('Text', related_name='lower_back', null=True, blank=True, on_delete=models.CASCADE)
+    front_chest_text = models.OneToOneField('Text', related_name='front_chest', null=True, blank=True, on_delete=models.SET_NULL)
+    right_arm_text = models.OneToOneField('Text', related_name='right_arm', null=True, blank=True, on_delete=models.SET_NULL)
+    upper_back_text = models.OneToOneField('Text', related_name='upper_back', null=True, blank=True, on_delete=models.SET_NULL)
+    middle_back_text = models.OneToOneField('Text', related_name='middle_back', null=True, blank=True, on_delete=models.SET_NULL)
+    lower_back_text = models.OneToOneField('Text', related_name='lower_back', null=True, blank=True, on_delete=models.SET_NULL)
 
-    front_image_url = models.CharField(max_length=100, null=True)
-    back_image_url = models.CharField(max_length=100, null=True)
+    front_image_url = models.CharField(max_length=100, blank=True, null=True)
+    back_image_url = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return str(self.group)+'_'+str(self.owner)+"_"+str(self.id)
