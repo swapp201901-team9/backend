@@ -73,9 +73,9 @@ class GetEmptyDesignCase(TestCase):
         response.render()
         stream = io.BytesIO(response.content)
         data = JSONParser().parse(stream)
-        self.assertEqual(data['detail_sleeve'], '#fcfcfc')
+        self.assertEqual(data['design']['sleeve'], '#fcfcfc')
         self.assertEqual(data['likes'], 0)
-        self.assertEqual(data['detail_body'], '#001c58')
+        self.assertEqual(data['design']['body'], '#001c58')
         # id, group, owner should be null for non-authorized requests
         self.assertEqual(data['id'], None)
         self.assertEqual(data['group'], None)
@@ -87,9 +87,9 @@ class GetEmptyDesignCase(TestCase):
         response.render()
         stream = io.BytesIO(response.content)
         data = JSONParser().parse(stream)
-        self.assertEqual(data['detail_sleeve'], '#fcfcfc')
+        self.assertEqual(data['design']['sleeve'], '#fcfcfc')
         self.assertEqual(data['likes'], 0)
-        self.assertEqual(data['detail_body'], '#001c58')
+        self.assertEqual(data['design']['body'], '#001c58')
         # id, group, owner should not be null for authorized requests
         self.assertFalse(data['id']==None)
         self.assertEquals(Group.objects.get(id=data['group']).group_name, 'user_group_user03')
@@ -129,9 +129,9 @@ class SaveDesignCase(TestCase):
         response.render()
         stream = io.BytesIO(response.content)
         data = JSONParser().parse(stream)
-        self.assertEqual(data['detail_sleeve'], '#232323')
+        self.assertEqual(data['design']['sleeve'], '#232323')
         self.assertEqual(data['likes'], 0)
-        self.assertEqual(data['detail_body'], '#232323')
+        self.assertEqual(data['design']['body'], '#232323')
         # id, group, owner should not be null for authorized requests
         self.assertEquals(data['id'], design_id)
         self.assertEquals(Group.objects.get(id=data['group']).group_name, 'user_group_user04')
@@ -164,8 +164,8 @@ class NewDesignCase(TestCase):
         response.render()
         stream = io.BytesIO(response.content)
         data = JSONParser().parse(stream)
-        self.assertEqual(data['detail_sleeve'], '#fcfcfc')
-        self.assertEqual(data['detail_body'], '#001c58')
+        self.assertEqual(data['design']['sleeve'], '#fcfcfc')
+        self.assertEqual(data['design']['body'], '#001c58')
         # id, group, owner should be null for non-authorized requests
         self.assertFalse(data['id']==self.design_id)
 
