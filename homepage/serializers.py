@@ -116,6 +116,20 @@ class DesignTextSerializer(serializers.ModelSerializer):
         model = Design
         fields = ('frontchest', 'rightarm', 'upperback', 'middleback', 'lowerback')
 
+class DesignLogoSerializer(serializers.ModelSerializer):
+    front = serializers.SerializerMethodField()
+    back = serializers.SerializerMethodField()
+
+    def get_front(self, obj):
+        return obj.front_logo_url
+
+    def get_back(self, obj):
+        return obj.back_logo_url
+
+    class Meta:
+        model = Design
+        fields = ('front', 'back')
+
 class DesignImageSerializer(serializers.ModelSerializer):
     front = serializers.SerializerMethodField()
     back = serializers.SerializerMethodField()
@@ -133,18 +147,21 @@ class DesignImageSerializer(serializers.ModelSerializer):
 class UserDesignSerializer(serializers.ModelSerializer):    
     design = serializers.SerializerMethodField()
     text = serializers.SerializerMethodField()
+    logo = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
 
     def get_design(self, obj):
         return DesignDetailSerializer(obj).data
     def get_text(self, obj):
         return DesignTextSerializer(obj).data
+    def get_logo(self, obj):
+        return DesignLogoSerializer(obj).data
     def get_image(self, obj):
         return DesignImageSerializer(obj).data
 
     class Meta:
         model = Design
-        fields = ('id', 'group', 'likes', 'design', 'text', 'image')
+        fields = ('id', 'group', 'likes', 'design', 'text', 'logo', 'image')
 
 class GroupDesignSerializer(serializers.ModelSerializer):
     auth = serializers.SerializerMethodField()
