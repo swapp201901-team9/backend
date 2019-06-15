@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import signals
 from django.contrib.auth.models import User
+from .default_logo import DEFAULT_LOGO_BASE64
 import base64
 
 # BLACK = 'BK'
@@ -76,6 +77,9 @@ class Design(models.Model):
 
     front_image_url = models.TextField(blank=True, null=True)
     back_image_url = models.TextField(blank=True, null=True)
+    front_logo_url = models.TextField(default=DEFAULT_LOGO_BASE64, blank=True, null=True)
+    back_logo_url = models.TextField(default=DEFAULT_LOGO_BASE64, blank=True, null=True)
+    DEFAULT_LOGO_BASE64
 
     def __str__(self):
         return str(self.group)+'_'+str(self.owner)+"_"+str(self.id)

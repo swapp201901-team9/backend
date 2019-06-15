@@ -380,6 +380,8 @@ def main(request):
         user.recent.banding=data['design']['banding']
         user.recent.stripe=data['design']['stripe']
         update_text(data['text'], user.recent)
+        user.recent.front_logo_url=data['logo']['front']
+        user.recent.back_logo_url=data['logo']['back']
         user.recent.front_image_url=data['image']['front']
         user.recent.back_image_url=data['image']['back']
         user.recent.save()
@@ -468,6 +470,8 @@ def post_design(request, group_id, design_id):
         copy_text(post_design, design)
         post_design.front_image_url = design.front_image_url
         post_design.back_image_url = design.back_image_url
+        post_design.front_logo_url = design.front_logo_url
+        post_design.back_logo_url = design.back_logo_url
         post_design.save()
 
         design_serializer = UserDesignSerializer(post_design)
