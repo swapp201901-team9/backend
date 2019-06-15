@@ -369,14 +369,14 @@ def copy_text_and_logo(post_design, design):
     frontlogo = Logo()
     frontlogo.src = design.front_logo.src
     frontlogo.left = design.front_logo.left
-    frontlogo.src = design.front_logo.src
+    frontlogo.top = design.front_logo.top
     frontlogo.save()
     post_design.front_logo = frontlogo
 
     backlogo = Logo()
     backlogo.src = design.back_logo.src
     backlogo.left = design.back_logo.left
-    backlogo.src = design.back_logo.src
+    backlogo.top = design.back_logo.top
     backlogo.save()
     post_design.back_logo = backlogo
 
