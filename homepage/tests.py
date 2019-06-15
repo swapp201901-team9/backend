@@ -1,5 +1,6 @@
 from django.test import TestCase, Client
 from django.http.request import HttpRequest
+from django.http.cookie import SimpleCookie
 from django.contrib.auth.models import User
 from rest_framework.parsers import JSONParser
 from .models import Group
@@ -17,8 +18,7 @@ class UserJoinCase(TestCase):
             self.assertEqual(1, 2)
         except User.DoesNotExist:
             pass
-        c = Client()
-        response = c.post('/users/', {'username': 'user01', 'password': 'pass'})
+        response = self.client.post('/users/', {'username': 'user01', 'password': 'pass'})
         self.assertEqual(response.status_code//100, 2)
         
         ## User Object Check
@@ -51,20 +51,12 @@ class UserJoinCase(TestCase):
 
 class UserLoginCase(TestCase):
     def setUp(self):
-        c = Client()
-        response = c.post('/users/', {'username': 'user02', 'password': 'pass'})
+        response = self.client.post('/users/', {'username': 'user02', 'password': 'pass'})
     
     def test_login(self):
-        # Check if joined successfully        
-        try:
-            user = User.objects.get(username='user02')
-        except User.DoesNotExist:
-            self.assertEqual(1, 2)
-        
         # Check if logged in successfully
-        c = Client()
         credentials = encode(b'user02:pass')
-        response = c.get('/auth/', HTTP_AUTHORIZATION='Basic ' + credentials.decode())
+        response = self.client.get('/auth/', HTTP_AUTHORIZATION='Basic ' + credentials.decode())
         self.assertEqual(response.status_code//100, 2)
         
 
@@ -72,40 +64,119 @@ class UserLoginCase(TestCase):
 
 class GetEmptyDesignCase(TestCase):
     def setUp(self):
-        c = Client()
-        response = c.post('/users/', {'username': 'user03', 'password': 'pass'})
+        self.client.post('/users/', {'username': 'user03', 'password': 'pass'})
 
     def test_default_attributes(self):
         """empty design objects have default values"""
-        FakeRequest = HttpRequest()
-        FakeRequest.method = 'GET'
-        
-        response = main(FakeRequest)
+        response = self.client.get('/')
+        self.assertEqual(response.status_code//100, 2)
         response.render()
         stream = io.BytesIO(response.content)
         data = JSONParser().parse(stream)
-        self.assertEqual(data['detail_sleeve'], 'WT')
+        self.assertEqual(data['design']['sleeve'], '#fcfcfc')
         self.assertEqual(data['likes'], 0)
-        self.assertEqual(data['detail_body'], 'BK')
+        self.assertEqual(data['design']['body'], '#001c58')
         # id, group, owner should be null for non-authorized requests
         self.assertEqual(data['id'], None)
         self.assertEqual(data['group'], None)
-        self.assertEqual(data['owner'], None)
 
-        user = User.objects.get(username='user03')
-        FakeRequest.user = user
-        response = main(FakeRequest)
+        # login to created account
+        self.client.login(username='user03',password='pass')
+        response = self.client.get('/')
+        self.assertEqual(response.status_code//100, 2)
         response.render()
         stream = io.BytesIO(response.content)
         data = JSONParser().parse(stream)
-        self.assertEqual(data['detail_sleeve'], 'WT')
+        self.assertEqual(data['design']['sleeve'], '#fcfcfc')
         self.assertEqual(data['likes'], 0)
-        self.assertEqual(data['detail_body'], 'BK')
+        self.assertEqual(data['design']['body'], '#001c58')
         # id, group, owner should not be null for authorized requests
         self.assertFalse(data['id']==None)
         self.assertEquals(Group.objects.get(id=data['group']).group_name, 'user_group_user03')
-        self.assertFalse(data['owner']==None)
 
 
-# class CreateDesignCase(TestCase):
-    
+class SaveDesignCase(TestCase):
+    def setUp(self):
+        self.client.post('/users/', {'username': 'user04', 'password': 'pass'})
+        self.client.login(username='user04',password='pass')
+
+    def test_save_design(self):
+        """get design id"""
+        response = self.client.get('/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        design_id = data['id']
+        """save design"""
+        # self.client.put(path='/', data={
+        #     "detail_body": "#232323",
+        #     "detail_buttons": "#232323",
+        #     "detail_sleeve": "#232323",
+        #     "detail_banding": "#232323",
+        #     "detail_stripes": "#232323",
+        #     "id": design_id
+        # }, content_type='application/json')
+        design_detail = """{
+            \"detail_body\": \"#232323\",
+            \"detail_buttons\": \"#232323\",
+            \"detail_sleeve\": \"#232323\",
+            \"detail_banding\": \"#232323\",
+            \"detail_stripes\": \"#232323\",
+            \"id\": """+str(design_id)+"}"
+        self.client.put(path='/', data=design_detail, content_type='application/json')
+        response = self.client.get('/')
+        self.assertEqual(response.status_code//100, 2)
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        self.assertEqual(data['design']['sleeve'], '#232323')
+        self.assertEqual(data['likes'], 0)
+        self.assertEqual(data['design']['body'], '#232323')
+        # id, group, owner should not be null for authorized requests
+        self.assertEquals(data['id'], design_id)
+        self.assertEquals(Group.objects.get(id=data['group']).group_name, 'user_group_user04')
+
+class NewDesignCase(TestCase):
+    def setUp(self):
+        self.client.post('/users/', {'username': 'user05', 'password': 'pass'})
+        self.client.login(username='user05',password='pass')
+        response = self.client.get('/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        self.design_id = data['id']
+        design_detail="""{
+            \"detail_body\": \"#232323\",
+            \"detail_buttons\": \"#232323\",
+            \"detail_sleeve\": \"#232323\",
+            \"detail_banding\": \"#232323\",
+            \"detail_stripes\": \"#232323\",
+            \"id\": """+str(self.design_id)+"}"
+        self.client.put(path='/', data=design_detail, content_type='application/json')
+
+    def test_new_design(self):
+        response = self.client.delete('/')
+        self.assertEqual(response.status_code//100, 2)
+        
+        """empty design objects have default values"""
+        response = self.client.get('/')
+        self.assertEqual(response.status_code//100, 2)
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        self.assertEqual(data['design']['sleeve'], '#fcfcfc')
+        self.assertEqual(data['design']['body'], '#001c58')
+        # id, group, owner should be null for non-authorized requests
+        self.assertFalse(data['id']==self.design_id)
+
+
+#################### Test Group Page ####################
+
+class CreateGroupCase(TestCase):
+    def setUp(self):
+        self.client.post('/users/', {'username': 'user06', 'password': 'pass'})
+        self.client.login(username='user06',password='pass')
+
+    def test_new_group(self):
+        self.assertEqual(1,1)
+

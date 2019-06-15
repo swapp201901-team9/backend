@@ -3,22 +3,22 @@ from django.db.models import signals
 from django.contrib.auth.models import User
 import base64
 
-BLACK = 'BK'
-BEIGE = 'BG'
-BLUE = 'BL'
-IVORY = 'IV'
-PINK = 'PK'
-RED = 'RD'
-WHITE = 'WT'
-COLOR_CHOICES = (
-    (BLACK, 'Black'),
-    (BEIGE, 'Beige'),
-    (BLUE, 'Blue'),
-    (IVORY, 'Ivory'),
-    (PINK, 'Pink'),
-    (RED, 'Red'),
-    (WHITE, 'White'),
-)
+# BLACK = 'BK'
+# BEIGE = 'BG'
+# BLUE = 'BL'
+# IVORY = 'IV'
+# PINK = 'PK'
+# RED = 'RD'
+# WHITE = 'WT'
+# COLOR_CHOICES = (
+#     (BLACK, 'Black'),
+#     (BEIGE, 'Beige'),
+#     (BLUE, 'Blue'),
+#     (IVORY, 'Ivory'),
+#     (PINK, 'Pink'),
+#     (RED, 'Red'),
+#     (WHITE, 'White'),
+# )
 
 MAJOR = 'MJ'
 CLUB = 'CL'
@@ -47,19 +47,52 @@ class Design(models.Model):
     owner = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     likes = models.IntegerField(default=0)
-    detail_body = models.CharField(
-        max_length=2,
-        choices=COLOR_CHOICES,
-        default=BLACK,
+    who = models.ManyToManyField('auth.User', related_name="who", blank=True)
+    body = models.CharField(
+        max_length=7,
+        default="#001c58",
     )
-    detail_sleeve = models.CharField(
-        max_length=2,
-        choices=COLOR_CHOICES,
-        default=WHITE,
+    button = models.CharField(
+        max_length=7,
+        default="#fcfcfc",
     )
+    sleeve = models.CharField(
+        max_length=7,
+        default="#fcfcfc",
+    )
+    banding = models.CharField(
+        max_length=7,
+        default="#001c58",
+    )
+    stripe = models.CharField(
+        max_length=7,
+        default="#fcfcfc",
+    )
+    front_chest_text = models.OneToOneField('Text', related_name='front_chest', null=True, blank=True, on_delete=models.CASCADE)
+    right_arm_text = models.OneToOneField('Text', related_name='right_arm', null=True, blank=True, on_delete=models.CASCADE)
+    upper_back_text = models.OneToOneField('Text', related_name='upper_back', null=True, blank=True, on_delete=models.CASCADE)
+    middle_back_text = models.OneToOneField('Text', related_name='middle_back', null=True, blank=True, on_delete=models.CASCADE)
+    lower_back_text = models.OneToOneField('Text', related_name='lower_back', null=True, blank=True, on_delete=models.CASCADE)
+
+    front_image_url = models.CharField(max_length=100, null=True)
+    back_image_url = models.CharField(max_length=100, null=True)
 
     def __str__(self):
         return str(self.group)+'_'+str(self.owner)+"_"+str(self.id)
+
+class Text(models.Model):
+    textvalue = models.CharField(max_length=50)
+    fontFamily = models.CharField(max_length=50)
+    fill = models.CharField(max_length=50)
+    fontStyle = models.CharField(max_length=50)
+    fontSize = models.IntegerField(default=100)
+    left = models.IntegerField(default=0)
+    top = models.IntegerField(default=0)
+    stroke = models.CharField(
+        max_length=7,
+        default="#fcfcfc",
+    )
+    strokewidth = models.IntegerField(default=0)
 
 class Profile(models.Model):
     user = models.OneToOneField('auth.User', on_delete=models.CASCADE,primary_key=True)
