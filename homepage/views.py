@@ -128,9 +128,75 @@ def profile(request, username):
         return Response(status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_403_FORBIDDEN)
 
+def set_default_text(design):
+    if design.front_chest_text == None:
+        frontchest = Text()
+        frontchest.textvalue = "S"
+        frontchest.fontFamily = "arial"
+        frontchest.fill = "#3f51b5"
+        frontchest.fontStyle = "bold"
+        frontchest.fontSize = 50
+        frontchest.left = 250
+        frontchest.top = 110
+        frontchest.stroke = "#000000"
+        frontchest.strokeWidth = 2
+        design.front_chest_text = frontchest
+    
+    if design.right_arm_text == None:
+        rightarm = Text()
+        rightarm.textvalue = "19"
+        rightarm.fontFamily = "arial"
+        rightarm.fill = "#607d8b"
+        rightarm.fontStyle = "bold"
+        rightarm.fontSize = 50
+        rightarm.left = 50
+        rightarm.top = 120
+        rightarm.stroke = ""
+        rightarm.strokeWidth = 0
+        design.right_arm_text = rightarm
+
+    if design.upper_back_text == None:
+        upperback = Text()
+        upperback.textvalue = "SEOUL NAT'L"
+        upperback.fontFamily = "arial"
+        upperback.fill = "#ffc107"
+        upperback.fontStyle = "bold"
+        upperback.fontSize = 25
+        upperback.left = 135
+        upperback.top = 125
+        upperback.stroke = ""
+        upperback.strokeWidth = 0
+        design.upper_back_text = upperback
+
+    if design.middle_back_text == None:
+        middleback = Text()
+        middleback.textvalue = "UNIVERSITY"
+        middleback.fontFamily = "arial"
+        middleback.fill = "#ffc107"
+        middleback.fontStyle = "bold"
+        middleback.fontSize = 20
+        middleback.left = 155
+        middleback.top = 155
+        middleback.stroke = ""
+        middleback.strokeWidth = 0
+        design.middle_back_text = middleback
+
+    if design.lower_back_text == None:
+        lowerback = Text()
+        lowerback.textvalue = "UNIVERSITY"
+        lowerback.fontFamily = "arial"
+        lowerback.fill = "#ffc107"
+        lowerback.fontStyle = "bold"
+        lowerback.fontSize = 15
+        lowerback.left = 150
+        lowerback.top = 190
+        lowerback.stroke = ""
+        lowerback.strokeWidth = 0
+        design.lower_back_text = lowerback
+
 @csrf_exempt
 @api_view(['GET', 'PUT', 'DELETE'])
-@permission_classes((IsAuthenticatedOrGETOnly,))
+@permission_classes((IsAuthenticatedOrGETDELETEOnly,))
 def main(request):    
     if request.method == 'GET':
         # check if user is logged in
@@ -151,26 +217,26 @@ def main(request):
                 design.save()
                 user.recent = design
                 user.save()
+        set_default_text(design)
         design_serializer = UserDesignSerializer(design)
         return Response(design_serializer.data)
     
-    # for the rest of the methods
-    try:
-        user = Profile.objects.get(user=request.user)
-    except Profile.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)    
-    
     # saves design to user group
     if request.method == 'PUT':
+        try:
+            user = Profile.objects.get(user=request.user)
+        except Profile.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)    
+
         data = json.loads(request.body.decode("utf-8")) 
         design_id=data['id']
         if design_id != user.recent.id:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        user.recent.detail_body=data['detail_body']
-        user.recent.detail_sleeve=data['detail_sleeve']
-        user.recent.detail_buttons=data['detail_buttons']
-        user.recent.detail_banding=data['detail_banding']
-        user.recent.detail_stripes=data['detail_stripes']
+        user.recent.body=data['detail_body']
+        user.recent.sleeve=data['detail_sleeve']
+        user.recent.button=data['detail_buttons']
+        user.recent.banding=data['detail_banding']
+        user.recent.stripe=data['detail_stripes']
         user.recent.save()
         design_serializer = UserDesignSerializer(user.recent)
         return Response(design_serializer.data)
@@ -178,13 +244,22 @@ def main(request):
     # doesn't really delete design but saves it in user group
     # needs to be deleted in user group detail
     if request.method == 'DELETE':
-        design = Design()
-        design.owner = request.user
-        design.group = user.user_group
-        design.save()
-        user.recent = design
-        user.save()
-        
+        if request.user.id == None: 
+            design = Design()
+        else:    
+            try:
+                user = Profile.objects.get(user=request.user)
+            except Profile.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            
+            design = Design()
+            design.owner = request.user
+            design.group = user.user_group
+            design.save()
+            user.recent = design
+            user.save()
+            
+        set_default_text(design)
         design_serializer = UserDesignSerializer(design)
         return Response(design_serializer.data)
 
@@ -240,11 +315,11 @@ def post_design(request, group_id, design_id):
         post_design=Design()
         post_design.owner = request.user
         post_design.group = group
-        post_design.detail_body = design.detail_body
-        post_design.detail_sleeve = design.detail_sleeve
-        post_design.detail_buttons = design.detail_buttons
-        post_design.detail_banding = design.detail_banding
-        post_design.detail_stripes = design.detail_stripes
+        post_design.body = design.detail_body
+        post_design.sleeve = design.detail_sleeve
+        post_design.button = design.detail_buttons
+        post_design.banding = design.detail_banding
+        post_design.stripe = design.detail_stripes
         post_design.save()
 
         design_serializer = UserDesignSerializer(post_design)
