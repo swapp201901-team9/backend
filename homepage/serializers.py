@@ -202,7 +202,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ('auth', 'likes', 'liked', 'writer', 'created_at', 'comment')
+        fields = ('id', 'auth', 'likes', 'liked', 'writer', 'created_at', 'comment')
 
 class GroupDesignSerializer(serializers.ModelSerializer):
     auth = serializers.SerializerMethodField()
@@ -229,7 +229,7 @@ class GroupDesignSerializer(serializers.ModelSerializer):
         return self.user in obj.who.all()
 
     def get_comments(self, obj):
-        c_set = Comment.objects.all().filter(design=obj).order_by('created_at')
+        c_set = Comment.objects.all().filter(design=obj).order_by('created_at').reverse()
         return CommentSerializer(c_set, user=self.user, many=True).data
     
     class Meta:

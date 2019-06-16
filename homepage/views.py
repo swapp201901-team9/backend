@@ -868,3 +868,48 @@ def delete_design(request, design_id):
         design.delete()
 
         return Response(status=status.HTTP_200_OK)
+
+@csrf_exempt
+@api_view(['GET', 'POST'])
+@permission_classes((IsAuthenticatedOrGETOnly,))
+def add_comment(request, design_id):
+    try:
+        design = Design.objects.get(id=design_id)
+    except Design.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'POST':
+        comment = Comment()
+        comment.writer = request.user
+        comment.design = design
+        comment.comment = request.data['comment']
+        comment.save()
+    
+    c_set = Comment.objects.all().filter(design=design).order_by('created_at').reverse()
+    return Response(CommentSerializer(c_set, user=request.user, many=True).data)
+
+@api_view(['GET', 'DELETE', 'PUT'])
+@permission_classes((IsAuthenticatedOrGETOnly,))
+def update_comment(request, design_id, comment_id):
+    try:
+        comment = Comment.objects.get(id=comment_id)
+    except Comment.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        design = Design.objects.get(id=design_id)
+    except Design.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if comment.design != design:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    if comment.writer != request.user or request.user not in comment.design.group.master.all():
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    if request.method == 'DELETE':
+        comment.delete()
+    if request.method == 'PUT':
+        comment.comment = request.data['comment']
+        comment.save()
+
+    c_set = Comment.objects.all().filter(design=design).order_by('created_at').reverse()
+    return Response(CommentSerializer(c_set, user=request.user, many=True).data)
