@@ -202,7 +202,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ('id', 'name', 'auth', 'likes', 'liked', 'writer', 'created_at', 'comment')
+        fields = ('id', 'design', 'name', 'auth', 'likes', 'liked', 'writer', 'created_at', 'comment')
 
 class GroupDesignSerializer(serializers.ModelSerializer):
     auth = serializers.SerializerMethodField()
