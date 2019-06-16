@@ -45,6 +45,7 @@ class Group(models.Model):
         return self.group_name
 
 class Comment(models.Model):
+    name = models.TextField(default="anonymous", blank=True, null=True)
     writer = models.ForeignKey('auth.User', related_name="writer", on_delete=models.CASCADE)
     design = models.ForeignKey('Design', on_delete=models.CASCADE)
     comment = models.TextField(default="Good Job!", blank=True, null=True)

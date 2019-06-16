@@ -882,6 +882,7 @@ def add_comment(request, design_id):
         comment = Comment()
         comment.writer = request.user
         comment.design = design
+        comment.name = request.data['name']
         comment.comment = request.data['comment']
         comment.save()
     
