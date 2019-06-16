@@ -177,9 +177,37 @@ class UserDesignSerializer(serializers.ModelSerializer):
         model = Design
         fields = ('id', 'group', 'likes', 'design', 'text', 'logo', 'image')
 
+class CommentSerializer(serializers.ModelSerializer):
+    auth = serializers.SerializerMethodField()
+    liked = serializers.SerializerMethodField()
+
+    def __init__(self, instance=None, user=None, data=empty, **kwargs):
+        self.instance = instance
+        if data is not empty:
+            self.initial_data = data
+        self.partial = kwargs.pop('partial', False)
+        self._context = kwargs.pop('context', {})
+        self.user = user
+        kwargs.pop('many', None)
+        super().__init__(**kwargs)
+
+    def get_auth(self, obj):
+        if self.user == None:
+            return False
+        else:
+            return self.user in obj.design.group.master.all() or self.user == obj.writer
+
+    def get_liked(self, obj):
+        return self.user in obj.who_c.all()
+
+    class Meta:
+        model = Comment
+        fields = ('auth', 'likes', 'liked', 'writer', 'created_at', 'comment')
+
 class GroupDesignSerializer(serializers.ModelSerializer):
     auth = serializers.SerializerMethodField()
     liked = serializers.SerializerMethodField()
+    comments = serializers.SerializerMethodField()
 
     def __init__(self, instance=None, user=None, data=empty, **kwargs):
         self.instance = instance
@@ -199,6 +227,10 @@ class GroupDesignSerializer(serializers.ModelSerializer):
 
     def get_liked(self, obj):
         return self.user in obj.who.all()
+
+    def get_comments(self, obj):
+        c_set = Comment.objects.all().filter(design=obj).order_by('created_at')
+        return CommentSerializer(c_set, user=self.user, many=True).data
     
     class Meta:
         model = Design
