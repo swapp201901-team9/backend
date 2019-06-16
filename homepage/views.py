@@ -139,7 +139,7 @@ def set_default_text_and_logo(design):
         frontchest.left = 250
         frontchest.top = 110
         frontchest.stroke = "#000000"
-        frontchest.strokewidth = 2
+        frontchest.strokeWidth = 2
         design.front_chest_text = frontchest
     
     if design.right_arm_text == None:
@@ -152,7 +152,7 @@ def set_default_text_and_logo(design):
         rightarm.left = 50
         rightarm.top = 120
         rightarm.stroke = ""
-        rightarm.strokewidth = 0
+        rightarm.strokeWidth = 0
         design.right_arm_text = rightarm
 
     if design.upper_back_text == None:
@@ -165,7 +165,7 @@ def set_default_text_and_logo(design):
         upperback.left = 135
         upperback.top = 125
         upperback.stroke = ""
-        upperback.strokewidth = 0
+        upperback.strokeWidth = 0
         design.upper_back_text = upperback
 
     if design.middle_back_text == None:
@@ -178,7 +178,7 @@ def set_default_text_and_logo(design):
         middleback.left = 155
         middleback.top = 155
         middleback.stroke = ""
-        middleback.strokewidth = 0
+        middleback.strokeWidth = 0
         design.middle_back_text = middleback
 
     if design.lower_back_text == None:
@@ -191,7 +191,7 @@ def set_default_text_and_logo(design):
         lowerback.left = 150
         lowerback.top = 190
         lowerback.stroke = ""
-        lowerback.strokewidth = 0
+        lowerback.strokeWidth = 0
         design.lower_back_text = lowerback
 
     if design.front_logo == None:
@@ -218,7 +218,7 @@ def update_text_and_logo(text, logo, design):
     frontchest.left = text['frontchest']['left']
     frontchest.top = text['frontchest']['top']
     frontchest.stroke = text['frontchest']['stroke']
-    frontchest.strokewidth = text['frontchest']['strokewidth']
+    frontchest.strokeWidth = text['frontchest']['strokeWidth']
     frontchest.save()
     design.front_chest_text = frontchest
     
@@ -233,7 +233,7 @@ def update_text_and_logo(text, logo, design):
     rightarm.left = text['rightarm']['left']
     rightarm.top = text['rightarm']['top']
     rightarm.stroke = text['rightarm']['stroke']
-    rightarm.strokewidth = text['rightarm']['strokewidth']
+    rightarm.strokeWidth = text['rightarm']['strokeWidth']
     rightarm.save()
     design.right_arm_text = rightarm
 
@@ -248,7 +248,7 @@ def update_text_and_logo(text, logo, design):
     upperback.left = text['upperback']['left']
     upperback.top = text['upperback']['top']
     upperback.stroke = text['upperback']['stroke']
-    upperback.strokewidth = text['upperback']['strokewidth']
+    upperback.strokeWidth = text['upperback']['strokeWidth']
     upperback.save()
     design.upper_back_text = upperback
 
@@ -263,7 +263,7 @@ def update_text_and_logo(text, logo, design):
     middleback.left = text['middleback']['left']
     middleback.top = text['middleback']['top']
     middleback.stroke = text['middleback']['stroke']
-    middleback.strokewidth = text['middleback']['strokewidth']
+    middleback.strokeWidth = text['middleback']['strokeWidth']
     middleback.save()
     design.middle_back_text = middleback
 
@@ -278,7 +278,7 @@ def update_text_and_logo(text, logo, design):
     lowerback.left = text['lowerback']['left']
     lowerback.top = text['lowerback']['top']
     lowerback.stroke = text['lowerback']['stroke']
-    lowerback.strokewidth = text['lowerback']['strokewidth']
+    lowerback.strokeWidth = text['lowerback']['strokeWidth']
     lowerback.save()
     design.lower_back_text = lowerback
 
@@ -310,7 +310,7 @@ def copy_text_and_logo(post_design, design):
     frontchest.left = design.front_chest_text.left
     frontchest.top = design.front_chest_text.top
     frontchest.stroke = design.front_chest_text.stroke
-    frontchest.strokewidth = design.front_chest_text.strokewidth
+    frontchest.strokeWidth = design.front_chest_text.strokeWidth
     frontchest.save()
     post_design.front_chest_text = frontchest
     
@@ -323,7 +323,7 @@ def copy_text_and_logo(post_design, design):
     rightarm.left = design.right_arm_text.left
     rightarm.top = design.right_arm_text.top
     rightarm.stroke = design.right_arm_text.stroke
-    rightarm.strokewidth = design.right_arm_text.strokewidth
+    rightarm.strokeWidth = design.right_arm_text.strokeWidth
     rightarm.save()
     post_design.right_arm_text = rightarm
 
@@ -336,7 +336,7 @@ def copy_text_and_logo(post_design, design):
     upperback.left = design.upper_back_text.left
     upperback.top = design.upper_back_text.top
     upperback.stroke = design.upper_back_text.stroke
-    upperback.strokewidth = design.upper_back_text.strokewidth
+    upperback.strokeWidth = design.upper_back_text.strokeWidth
     upperback.save()
     post_design.upper_back_text = upperback
 
@@ -349,7 +349,7 @@ def copy_text_and_logo(post_design, design):
     middleback.left = design.middle_back_text.left
     middleback.top = design.middle_back_text.top
     middleback.stroke = design.middle_back_text.stroke
-    middleback.strokewidth = design.middle_back_text.strokewidth
+    middleback.strokeWidth = design.middle_back_text.strokeWidth
     middleback.save()
     post_design.middle_back_text = middleback
 
@@ -362,21 +362,21 @@ def copy_text_and_logo(post_design, design):
     lowerback.left = design.lower_back_text.left
     lowerback.top = design.lower_back_text.top
     lowerback.stroke = design.lower_back_text.stroke
-    lowerback.strokewidth = design.lower_back_text.strokewidth
+    lowerback.strokeWidth = design.lower_back_text.strokeWidth
     lowerback.save()
     post_design.lower_back_text = lowerback
 
     frontlogo = Logo()
     frontlogo.src = design.front_logo.src
     frontlogo.left = design.front_logo.left
-    frontlogo.src = design.front_logo.src
+    frontlogo.top = design.front_logo.top
     frontlogo.save()
     post_design.front_logo = frontlogo
 
     backlogo = Logo()
     backlogo.src = design.back_logo.src
     backlogo.left = design.back_logo.left
-    backlogo.src = design.back_logo.src
+    backlogo.top = design.back_logo.top
     backlogo.save()
     post_design.back_logo = backlogo
 
@@ -424,8 +424,8 @@ def main(request):
         user.recent.banding=data['design']['banding']
         user.recent.stripe=data['design']['stripe']
         update_text_and_logo(data['text'], data['logo'], user.recent)
-        user.recent.front_image_url=data['image']['front']
-        user.recent.back_image_url=data['image']['back']
+        user.recent.front_image_url=data['image']['frontImg']
+        user.recent.back_image_url=data['image']['backImg']
         user.recent.save()
         design_serializer = UserDesignSerializer(user.recent)
         return Response(design_serializer.data)
