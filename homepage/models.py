@@ -44,6 +44,14 @@ class Group(models.Model):
     def __str__(self):
         return self.group_name
 
+class Comment(models.Model):
+    writer = models.ForeignKey('auth.User', related_name="writer", on_delete=models.CASCADE)
+    design = models.ForeignKey('Design', on_delete=models.CASCADE)
+    comment = models.TextField(default="Good Job!", blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    likes = models.IntegerField(default=0)
+    who_c = models.ManyToManyField('auth.User', related_name="who_c", blank=True)
+
 class Design(models.Model):
     owner = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
