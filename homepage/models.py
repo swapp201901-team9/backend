@@ -93,6 +93,8 @@ class Design(models.Model):
 
 class Logo(models.Model):
     src = models.TextField(default=DEFAULT_LOGO_BASE64, blank=True, null=True)
+    width = models.IntegerField(default=180)
+    height = models.IntegerField(default=186)
     left = models.IntegerField(default=0)
     top = models.IntegerField(default=0)
 

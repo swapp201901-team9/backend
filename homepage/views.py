@@ -183,7 +183,7 @@ def set_default_text_and_logo(design):
 
     if design.lower_back_text == None:
         lowerback = Text()
-        lowerback.textvalue = "Department of Computer Science"
+        lowerback.textvalue = "Department of\nComputer Science"
         lowerback.fontFamily = "arial"
         lowerback.fill = "#ffc107"
         lowerback.fontStyle = "bold"
