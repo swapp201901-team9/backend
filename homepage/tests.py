@@ -23,5 +23,7 @@
 # Group Drop
 # Group Admin
 # Post Design
-# Like Design
-# Comment Design
+# Delete Design
+# Like/UnLike Design
+# Add Comment
+# Update/Delete Comment
