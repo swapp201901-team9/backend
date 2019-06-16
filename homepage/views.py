@@ -369,14 +369,14 @@ def copy_text_and_logo(post_design, design):
     frontlogo = Logo()
     frontlogo.src = design.front_logo.src
     frontlogo.left = design.front_logo.left
-    frontlogo.src = design.front_logo.src
+    frontlogo.top = design.front_logo.top
     frontlogo.save()
     post_design.front_logo = frontlogo
 
     backlogo = Logo()
     backlogo.src = design.back_logo.src
     backlogo.left = design.back_logo.left
-    backlogo.src = design.back_logo.src
+    backlogo.top = design.back_logo.top
     backlogo.save()
     post_design.back_logo = backlogo
 
@@ -424,10 +424,8 @@ def main(request):
         user.recent.banding=data['design']['banding']
         user.recent.stripe=data['design']['stripe']
         update_text_and_logo(data['text'], data['logo'], user.recent)
-        user.recent.front_logo_url=data['logo']['front']
-        user.recent.back_logo_url=data['logo']['back']
-        user.recent.front_image_url=data['image']['front']
-        user.recent.back_image_url=data['image']['back']
+        user.recent.front_image_url=data['image']['frontImg']
+        user.recent.back_image_url=data['image']['backImg']
         user.recent.save()
         design_serializer = UserDesignSerializer(user.recent)
         return Response(design_serializer.data)
