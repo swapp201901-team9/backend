@@ -100,7 +100,7 @@ class Text(models.Model):
         max_length=7,
         default="#fcfcfc",
     )
-    strokewidth = models.IntegerField(default=0)
+    strokeWidth = models.IntegerField(default=0)
 
 class Profile(models.Model):
     user = models.OneToOneField('auth.User', on_delete=models.CASCADE,primary_key=True)
