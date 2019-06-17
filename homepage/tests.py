@@ -118,11 +118,11 @@ class UserProfile(TestCase):
         response.render()
         stream = io.BytesIO(response.content)
         data = JSONParser().parse(stream)
-        response = self.client.put('/users/profile/', {
-            'id': data['id'],
-            'username': 'profile',
-            'password': 'passwd'
-            },
+        response = self.client.put('/users/profile/', """{
+            \"id\": """ + str(data['id']) + """,
+            \"username\": \"profile\",
+            \"password\": \"passwd\"
+            }""",
             content_type='application/json')
         self.assertEqual(response.status_code//100, 2)
         self.client.logout()
