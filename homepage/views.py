@@ -612,7 +612,9 @@ def join_group(request, group_id):
             group = Group.objects.get(id=group_id)
         except Group.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        
+        if group.group_type == 'UR':
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+            
         if request.user.id == None:
             return Response(status=status.HTTP_403_FORBIDDEN)
         try:
@@ -620,6 +622,8 @@ def join_group(request, group_id):
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         
+        if user in group.users.all():
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         group.users.add(user)
         group_serializer = GroupSerializer(group)
         return Response(group_serializer.data)

@@ -882,96 +882,310 @@ class CreateGroupCase(TestCase):
 
 ## Group List
 class GroupListCase(TestCase):
+    def setUp(self):
+        self.client.post('/users/', {'username': 'grouplist1', 'password': 'pass'})
+        self.client.login(username='grouplist1',password='pass')
+        self.client.post('/create_group/', "{\"grouptype\": \"MJ\", \"groupname\": \"group1\"}", content_type='application/json')
+        self.client.post('/create_group/', "{\"grouptype\": \"MJ\", \"groupname\": \"group2\"}", content_type='application/json')
+        self.client.logout()
+        self.client.post('/users/', {'username': 'grouplist2', 'password': 'pass'})
+        self.client.login(username='grouplist2',password='pass')
+        self.client.post('/create_group/', "{\"grouptype\": \"MJ\", \"groupname\": \"group3\"}", content_type='application/json')
+        self.client.post('/create_group/', "{\"grouptype\": \"MJ\", \"groupname\": \"group4\"}", content_type='application/json')
+        self.client.logout()
+        self.groups = Group.objects.all().exclude(group_type='UR')
+
     # Get Whole Group List
     def test_whole_group(self):
-        self.assertEqual(1,1)
-
+        self.client.logout()
+        response = self.client.get('/groups/')
+        self.assertEqual(response.status_code//100, 2)
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        response_groups = []
+        for group in data:
+            try:
+                response_groups.append(Group.objects.get(id=group['id']))
+            except Group.DoesNotExist:
+                self.assertEqual(1, 2)
+        for group in self.groups:
+            self.assertTrue(group in response_groups)
+        
     # Get Joined Group List
     def test_joined_group(self):
-        self.assertEqual(1,1)
+        user = User.objects.get(username='grouplist1')
+        self.client.login(username='grouplist1',password='pass')
+        groups = Group.objects.all()
+        response = self.client.get('/groups/grouplist1/')
+        self.assertEqual(response.status_code//100, 2)
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        response_groups = []
+        for group in data:
+            try:
+                response_groups.append(Group.objects.get(id=group['id']))
+            except Group.DoesNotExist:
+                self.assertEqual(1, 2)
+        for group in groups:
+            if user in group.users.all():
+                self.assertTrue(group in response_groups)
 
     # Get Joined Group List without Login
     def test_without_auth(self):
         self.client.logout()
-        self.assertEqual(1,1)
+        response = self.client.get('/groups/grouplist1/')
+        self.assertEqual(response.status_code//100, 4)
 
 ## Group Join
 class GroupJoinCase(TestCase):
+    def setUp(self):
+        self.client.post('/users/', {'username': 'groupjoin1', 'password': 'pass'})
+        self.client.post('/users/', {'username': 'groupjoin2', 'password': 'pass'})
+        self.client.login(username='groupjoin1',password='pass')
+        self.client.post('/create_group/', "{\"grouptype\": \"MJ\", \"groupname\": \"dest_group\"}", content_type='application/json')
+        self.client.logout()
+        self.group = Group.objects.get(group_name='dest_group')
+
+    
     # Group Join without Login
     def test_without_auth(self):
         self.client.logout()
-        self.assertEqual(1,1)
+        response = self.client.get('/join_group/' + str(self.group.id) + '/')
+        self.assertEqual(response.status_code//100, 4)
 
     # Group Join
     def test_group_join(self):
-        self.assertEqual(1,1)
+        user = User.objects.get(username='groupjoin2')
+        self.assertTrue(user not in self.group.users.all())
+        self.client.login(username='groupjoin2',password='pass')
+        response = self.client.get('/join_group/' + str(self.group.id) + '/')
+        self.assertEqual(response.status_code//100, 2)
+        self.assertTrue(user in self.group.users.all())
+        self.client.logout()
 
     # Join Same Group
     def test_with_dups(self):
-        self.assertEqual(1,1)
+        self.client.login(username='groupjoin1',password='pass')
+        response = self.client.get('/join_group/' + str(self.group.id) + '/')
+        self.assertEqual(response.status_code//100, 4)
+        self.client.logout()
 
     # Join User Group
     def test_user_group(self):
-        self.assertEqual(1,1)
+        gid = Group.objects.get(group_name='user_group_groupjoin2').id
+        self.client.login(username='groupjoin1',password='pass')
+        response = self.client.get('/join_group/' + str(gid) + '/')
+        self.assertEqual(response.status_code//100, 4)
+        self.client.logout()
 
     # Join UnExisting Group
     def test_unexisting(self):
-        self.assertEqual(1,1)
-
-## Group Drop
-class GroupDropCase(TestCase):
-    # Group Drop without Login
-    def test_without_auth(self):
+        gid = 100
+        try:
+            group = Group.objects.get(id=gid)
+            self.assertEqual(1, 2)
+        except Group.DoesNotExist:
+            pass
+        self.client.login(username='groupjoin1',password='pass')
+        response = self.client.get('/join_group/' + str(gid) + '/')
+        self.assertEqual(response.status_code//100, 4)
         self.client.logout()
-        self.assertEqual(1,1)
-
-    # Member Group Drop
-    def test_group_drop(self):
-        self.assertEqual(1,1)
-
-    # Member Drop Group not Joined
-    # Drop UnExisting Group
-    def test_unexisting(self):
-        self.assertEqual(1,1)
-
-    # Admin Drop
-    # Last Admin Drop
-    def test_admin_drop(self):
-        self.assertEqual(1,1)
-
-    # Drop User Group
-    def test_user_group(self):
-        self.assertEqual(1,1)
 
 ## Group Admin
 class GroupAdminCase(TestCase):
+    def setUp(self):
+        self.client.post('/users/', {'username': 'groupadmin1', 'password': 'pass'})
+        self.client.post('/users/', {'username': 'groupadmin2', 'password': 'pass'})
+        self.client.post('/users/', {'username': 'groupadmin3', 'password': 'pass'})
+        self.client.post('/users/', {'username': 'groupadmin4', 'password': 'pass'})
+        self.client.login(username='groupadmin1',password='pass')
+        self.client.post('/create_group/', "{\"grouptype\": \"MJ\", \"groupname\": \"admin_group\"}", content_type='application/json')
+        self.client.post('/create_group/', "{\"grouptype\": \"MJ\", \"groupname\": \"admin_group_dup\"}", content_type='application/json')
+        self.client.logout()
+        self.group = Group.objects.get(group_name='admin_group')
+        self.client.login(username='groupadmin2',password='pass')
+        self.client.get('/join_group/' + str(self.group.id) + '/')
+        self.client.logout()
+        self.client.login(username='groupadmin3',password='pass')
+        self.client.get('/join_group/' + str(self.group.id) + '/')
+        self.client.logout()
+    
     # Access without Login
     # Access without Admin Rights
     def test_without_auth(self):
         self.client.logout()
-        self.assertEqual(1,1)
+        response = self.client.get('/groups/' + str(self.group.id) + '/admin/')
+        self.assertEqual(response.status_code//100, 4)
+        self.client.login(username='groupadmin2',password='pass')
+        response = self.client.get('/groups/' + str(self.group.id) + '/admin/')
+        self.assertEqual(response.status_code//100, 2)
+        self.client.logout()
+        self.client.login(username='groupadmin4',password='pass')
+        response = self.client.get('/groups/' + str(self.group.id) + '/admin/')
+        self.assertEqual(response.status_code//100, 4)
+        self.client.logout()
         
     # Access UnExisting Group Admin
     def test_unexisting(self):
-        self.assertEqual(1,1)
+        gid = 100
+        try:
+            group = Group.objects.get(id=gid)
+            self.assertEqual(1, 2)
+        except Group.DoesNotExist:
+            pass
+        self.client.login(username='groupadmin4',password='pass')
+        response = self.client.get('/groups/' + str(gid) + '/admin/')
+        self.assertEqual(response.status_code//100, 4)
+        self.client.logout()
 
     # Group Type Change
     # Group Name Change
     def test_group_change(self):
-        self.assertEqual(1,1)
+        self.client.login(username='groupadmin1',password='pass')
+        response = self.client.get('/groups/' + str(self.group.id) + '/admin/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        self.assertEqual(data[0]['group_name'], 'admin_group')
+        self.assertEqual(data[0]['group_type'], 'MJ')
+        response = self.client.put('/groups/' + str(self.group.id) + '/admin/', """{
+            \"group_name\": \"hello_world\",
+            \"group_type\": \"CL\"
+            }""",
+            content_type='application/json')
+        self.assertEqual(response.status_code//100, 2)
+        response = self.client.get('/groups/' + str(self.group.id) + '/admin/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        self.assertFalse(data[0]['group_name'] == 'admin_group')
+        self.assertFalse(data[0]['group_type'] == 'MJ')
+        self.assertEqual(data[0]['group_name'], 'hello_world')
+        self.assertEqual(data[0]['group_type'], 'CL')
+        self.assertEqual(self.group.id, data[0]['id'])
+        self.client.logout()
 
     # Group Name Change with Duplicates
     def test_with_dups(self):
-        self.assertEqual(1,1)
+        self.client.login(username='groupadmin1',password='pass')
+        response = self.client.put('/groups/' + str(self.group.id) + '/admin/', """{
+            \"group_name\": \"admin_group_dup\",
+            \"group_type\": \"MJ\"
+            }""",
+            content_type='application/json')
+        self.assertEqual(response.status_code//100, 4)
+        
 
     # Member to Admin
-    def test_member_to_admin(self):
-        self.assertEqual(1,1)
-
     # Member Drop
     # Drop Admin
-    def test_member_drop(self):
-        self.assertEqual(1,1)
+    # Drop Self
+    def test_update_member(self):
+        user1 = User.objects.get(username='groupadmin1')
+        user2 = User.objects.get(username='groupadmin2')
+        user3 = User.objects.get(username='groupadmin3')
+        
+        # Member to Admin
+        self.assertTrue(user2 not in self.group.master.all())
+        self.client.login(username='groupadmin1',password='pass')
+        response = self.client.put('/groups/' + str(self.group.id) + '/members/' + str(user2.id) + '/')
+        self.assertEqual(response.status_code//100, 2)
+        self.assertTrue(user2 in self.group.master.all())
+
+        # Member Drop
+        self.assertTrue(user3 in self.group.users.all())
+        response = self.client.delete('/groups/' + str(self.group.id) + '/members/' + str(user3.id) + '/')
+        self.assertEqual(response.status_code//100, 2)
+        self.assertTrue(user3 not in self.group.master.all())
+
+        # Drop Self
+        response = self.client.delete('/groups/' + str(self.group.id) + '/members/' + str(user1.id) + '/')
+        self.assertEqual(response.status_code//100, 4)
+
+        # Drop Admin
+        self.assertTrue(user2 in self.group.master.all())
+        self.assertTrue(user2 in self.group.users.all())
+        response = self.client.delete('/groups/' + str(self.group.id) + '/members/' + str(user2.id) + '/')
+        self.assertEqual(response.status_code//100, 2)
+        self.assertTrue(user2 not in self.group.master.all())
+        self.assertTrue(user2 not in self.group.users.all())
+        self.client.logout()
+
+## Group Drop
+class GroupDropCase(TestCase):
+    def setUp(self):
+        self.client.post('/users/', {'username': 'groupdrop1', 'password': 'pass'})
+        self.client.post('/users/', {'username': 'groupdrop2', 'password': 'pass'})
+        self.client.post('/users/', {'username': 'groupdrop3', 'password': 'pass'})
+        self.client.post('/users/', {'username': 'groupdrop4', 'password': 'pass'})
+        self.client.login(username='groupdrop1',password='pass')
+        self.client.post('/create_group/', "{\"grouptype\": \"MJ\", \"groupname\": \"drop_group\"}", content_type='application/json')
+        self.client.logout()
+        self.group = Group.objects.get(group_name='drop_group')
+        self.client.login(username='groupdrop2',password='pass')
+        self.client.get('/join_group/' + str(self.group.id) + '/')
+        self.client.logout()
+        self.client.login(username='groupdrop3',password='pass')
+        self.client.get('/join_group/' + str(self.group.id) + '/')
+        self.client.logout()
+
+    # Member Group Drop
+    def test_group_drop(self):
+        user = User.objects.get(username='groupdrop3')
+        self.assertTrue(user in self.group.users.all())
+        self.client.login(username='groupdrop3',password='pass')
+        response = self.client.get('/groups/' + str(self.group.id) + '/drop/')
+        self.assertEqual(response.status_code//100, 2)
+        self.assertTrue(user not in self.group.users.all())
+        self.client.logout()
+
+    # Member Drop Group not Joined
+    # Drop UnExisting Group
+    def test_unexisting(self):
+        user = User.objects.get(username='groupdrop4')
+        self.assertTrue(user not in self.group.users.all())
+        self.client.login(username='groupdrop4',password='pass')
+        response = self.client.get('/groups/' + str(self.group.id) + '/drop/')
+        self.assertEqual(response.status_code//100, 4)
+        gid = 100
+        try:
+            group = Group.objects.get(id=gid)
+            self.assertEqual(1, 2)
+        except Group.DoesNotExist:
+            pass
+        response = self.client.get('/groups/' + str(gid) + '/drop/')
+        self.assertEqual(response.status_code//100, 4)
+        self.client.logout()
+
+    # Admin Drop
+    # Last Admin Drop
+    def test_admin_drop(self):
+        user1 = User.objects.get(username='groupdrop1')
+        user2 = User.objects.get(username='groupdrop2')
+        self.client.login(username='groupdrop1',password='pass')
+        self.client.put('/groups/' + str(self.group.id) + '/members/' + str(user2.id) + '/')
+        self.assertTrue(user1 in self.group.master.all())
+        self.assertTrue(user1 in self.group.users.all())
+        response = self.client.get('/groups/' + str(self.group.id) + '/drop/')
+        self.assertEqual(response.status_code//100, 2)
+        self.assertTrue(user1 not in self.group.master.all())
+        self.assertTrue(user1 not in self.group.users.all())
+        self.client.logout()
+        self.client.login(username='groupdrop2',password='pass')
+        self.assertTrue(user2 in self.group.master.all())
+        self.assertTrue(user2 in self.group.users.all())
+        response = self.client.get('/groups/' + str(self.group.id) + '/drop/')
+        self.assertEqual(response.status_code//100, 4)
+        self.client.logout()
+
+    # Drop User Group
+    def test_user_group(self):
+        gid = Group.objects.get(group_name='user_group_groupdrop1').id
+        self.client.login(username='groupdrop1',password='pass')
+        response = self.client.get('/groups/' + str(gid) + '/drop/')
+        self.assertEqual(response.status_code//100, 4)
 
 ## Post Design
 class PostDesignCase(TestCase):
