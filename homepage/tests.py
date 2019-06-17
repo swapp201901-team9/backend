@@ -826,7 +826,13 @@ class CreateGroupCase(TestCase):
     # Group Create without Login
     def test_without_auth(self):
         self.client.logout()
-        self.assertEqual(1,1)
+        try:
+            group = Group.objects.get(group_name='unauth_group')
+            self.assertEqual(1, 2)
+        except Group.DoesNotExist:
+            pass
+        response = self.client.post('/create_group/', "{\"grouptype\": \"MJ\", \"groupname\": \"unauth_group\"}", content_type='application/json')
+        self.assertEqual(response.status_code//100, 4)
 
     # Group Create
     def test_group_create(self):
@@ -836,7 +842,7 @@ class CreateGroupCase(TestCase):
             self.assertEqual(1, 2)
         except Group.DoesNotExist:
             pass
-        response = self.client.post('/create_group/', {'grouptype': 'MJ', 'groupname': 'new_group'}, content_type='application/json')
+        response = self.client.post('/create_group/', "{\"grouptype\": \"MJ\", \"groupname\": \"new_group\"}", content_type='application/json')
         self.assertEqual(response.status_code//100, 2)
         try:
             group = Group.objects.get(group_name='new_group')
@@ -855,12 +861,12 @@ class CreateGroupCase(TestCase):
             self.assertEqual(1, 2)
         except Group.DoesNotExist:
             pass
-        response = self.client.post('/create_group/', {'grouptype': 'MJ', 'groupname': 'dup_group'}, content_type='application/json')
+        response = self.client.post('/create_group/', "{\"grouptype\": \"MJ\", \"groupname\": \"dup_group\"}", content_type='application/json')
         try:
             group = Group.objects.get(group_name='dup_group')
         except Group.DoesNotExist:
             self.assertEqual(1, 2)
-        response = self.client.post('/create_group/', {'grouptype': 'MJ', 'groupname': 'dup_group'}, content_type='application/json')
+        response = self.client.post('/create_group/', "{\"grouptype\": \"MJ\", \"groupname\": \"dup_group\"}", content_type='application/json')
         self.assertEqual(response.status_code//100, 4)
 
     # User Group Create
@@ -871,7 +877,7 @@ class CreateGroupCase(TestCase):
             self.assertEqual(1, 2)
         except Group.DoesNotExist:
             pass
-        response = self.client.post('/create_group/', {'grouptype': 'UR', 'groupname': 'user_group'}, content_type='application/json')
+        response = self.client.post('/create_group/', "{\"grouptype\": \"UR\", \"groupname\": \"user_group\"}", content_type='application/json')
         self.assertEqual(response.status_code//100, 4)
 
 ## Group List
