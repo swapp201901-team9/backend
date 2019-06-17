@@ -915,6 +915,7 @@ def update_comment(request, design_id, comment_id):
     if request.method == 'DELETE':
         comment.delete()
     if request.method == 'PUT':
+        comment.name = request.data['name']
         comment.comment = request.data['comment']
         comment.save()
 
