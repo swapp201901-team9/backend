@@ -35,7 +35,7 @@ class Group(models.Model):
     group_type = models.CharField(
         max_length=2,
         choices=GROUP_TYPE,
-        default=MAJOR,
+        default=CLUB,
     )
     group_name = models.CharField(max_length=50)
     users = models.ManyToManyField('auth.User')
