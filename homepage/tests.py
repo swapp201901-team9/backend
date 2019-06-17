@@ -2604,10 +2604,11 @@ class UpdateCommentCase(TestCase):
     def test_update_comment(self):
         comment_before = Comment.objects.get(id=self.comment_id1)
         self.client.login(username='updatecomment1', password='pass')
-        response = self.client.put('/groups/comment/'+str(self.group_design_id)+'/'+str(self.comment_id1)+'/', "{\"comment\":\"hello\"}", content_type='application/json')
+        response = self.client.put('/groups/comment/'+str(self.group_design_id)+'/'+str(self.comment_id1)+'/', "{\"name\":\"namely\",\"comment\":\"hello\"}", content_type='application/json')
         self.assertEqual(response.status_code//100, 2)
         comment_after = Comment.objects.get(id=self.comment_id1)
         self.assertEqual(comment_before.id, comment_after.id)
+        self.assertFalse(comment_before.name == comment_after.name)
         self.assertFalse(comment_before.comment == comment_after.comment)
         response = self.client.delete('/groups/comment/'+str(self.group_design_id)+'/'+str(self.comment_id1)+'/')
         self.assertEqual(response.status_code//100, 2)
@@ -2623,10 +2624,10 @@ class UpdateCommentCase(TestCase):
     # Non-Owner Update Comment
     def test_without_auth(self):
         self.client.logout()
-        response = self.client.put('/groups/comment/'+str(self.group_design_id)+'/'+str(self.comment_id2)+'/', "{\"comment\":\"hello\"}", content_type='application/json')
+        response = self.client.put('/groups/comment/'+str(self.group_design_id)+'/'+str(self.comment_id2)+'/', "{\"name\":\"namely\",\"comment\":\"hello\"}", content_type='application/json')
         self.assertEqual(response.status_code//100, 4)
         self.client.login(username='updatecomment2', password='pass')
-        response = self.client.put('/groups/comment/'+str(self.group_design_id)+'/'+str(self.comment_id2)+'/', "{\"comment\":\"hello\"}", content_type='application/json')
+        response = self.client.put('/groups/comment/'+str(self.group_design_id)+'/'+str(self.comment_id2)+'/', "{\"name\":\"namely\",\"comment\":\"hello\"}", content_type='application/json')
         self.assertEqual(response.status_code//100, 4)
         self.client.logout()
 
@@ -2638,10 +2639,11 @@ class UpdateCommentCase(TestCase):
         self.client.put('/groups/' + str(self.group.id) + '/members/' + str(user.id) + '/')
         self.client.logout()
         self.client.login(username='updatecomment2', password='pass')
-        response = self.client.put('/groups/comment/'+str(self.group_design_id)+'/'+str(self.comment_id2)+'/', "{\"comment\":\"hello\"}", content_type='application/json')
+        response = self.client.put('/groups/comment/'+str(self.group_design_id)+'/'+str(self.comment_id2)+'/', "{\"name\":\"namely\",\"comment\":\"hello\"}", content_type='application/json')
         self.assertEqual(response.status_code//100, 2)
         comment_after = Comment.objects.get(id=self.comment_id2)
         self.assertEqual(comment_before.id, comment_after.id)
+        self.assertFalse(comment_before.name == comment_after.name)
         self.assertFalse(comment_before.comment == comment_after.comment)
         response = self.client.delete('/groups/comment/'+str(self.group_design_id)+'/'+str(self.comment_id2)+'/')
         self.assertEqual(response.status_code//100, 2)
