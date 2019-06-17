@@ -1189,116 +1189,1465 @@ class GroupDropCase(TestCase):
 
 ## Post Design
 class PostDesignCase(TestCase):
+    def setUp(self):
+        self.client.post('/users/', {'username': 'post1', 'password': 'pass'})
+        self.client.post('/users/', {'username': 'post2', 'password': 'pass'})
+        self.client.login(username='post1',password='pass')
+        response = self.client.get('/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        self.design_id1 = data['id']
+        design_data = """{
+            \"id\": """ + str(self.design_id1) + """,
+            \"design\": {
+                \"body\": \"#fcfcfc\",
+                \"button\": \"#fcfcfc\",
+                \"sleeve\": \"#fcfcfc\",
+                \"banding\": \"#fcfcfc\",
+                \"stripe\": \"#fcfcfc\"
+            },
+            \"text\": {
+                \"frontchest\": {
+                    \"id\": null,
+                    \"textvalue\": \"S\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#3f51b5\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 50,
+                    \"left\": 250,
+                    \"top\": 110,
+                    \"stroke\": \"#000000\",
+                    \"strokeWidth\": 2
+                },
+                \"rightarm\": {
+                    \"id\": null,
+                    \"textvalue\": \"19\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#607d8b\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 50,
+                    \"left\": 50,
+                    \"top\": 120,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"upperback\": {
+                    \"id\": null,
+                    \"textvalue\": \"SEOUL NAT'L\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 25,
+                    \"left\": 135,
+                    \"top\": 125,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"middleback\": {
+                    \"id\": null,
+                    \"textvalue\": \"UNIVERSITY\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 20,
+                    \"left\": 155,
+                    \"top\": 155,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"lowerback\": {
+                    \"id\": null,
+                    \"textvalue\": \"hi\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 15,
+                    \"left\": 150,
+                    \"top\": 190,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                }
+            },
+            \"logo\": {
+                \"front\": {
+                    \"id\": null,
+                    \"src\": \"hi\",
+                    \"width\": 571,
+                    \"height\": 589,
+                    \"left\": 340,
+                    \"top\": 180,
+                    \"scaleX\": 1,
+                    \"scaleY\": 1
+                },
+                \"back\": {
+                    \"id\": null,
+                    \"src\": \"hi\",
+                    \"width\": 571,
+                    \"height\": 589,
+                    \"left\": 215,
+                    \"top\": 280,
+                    \"scaleX\": 1,
+                    \"scaleY\": 1
+                }
+            },
+            \"image\": {
+                \"frontImg\": null,
+                \"backImg\": null
+            }
+        }"""
+        self.client.put(path='/', data=design_data, content_type='application/json')
+        self.client.post('/create_group/', "{\"grouptype\": \"MJ\", \"groupname\": \"post_group\"}", content_type='application/json')
+        self.client.logout()
+        self.client.login(username='post2',password='pass')
+        response = self.client.get('/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        self.design_id2 = data['id']
+        design_data = """{
+            \"id\": """ + str(self.design_id2) + """,
+            \"design\": {
+                \"body\": \"#fcfcfc\",
+                \"button\": \"#fcfcfc\",
+                \"sleeve\": \"#fcfcfc\",
+                \"banding\": \"#fcfcfc\",
+                \"stripe\": \"#fcfcfc\"
+            },
+            \"text\": {
+                \"frontchest\": {
+                    \"id\": null,
+                    \"textvalue\": \"S\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#3f51b5\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 50,
+                    \"left\": 250,
+                    \"top\": 110,
+                    \"stroke\": \"#000000\",
+                    \"strokeWidth\": 2
+                },
+                \"rightarm\": {
+                    \"id\": null,
+                    \"textvalue\": \"19\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#607d8b\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 50,
+                    \"left\": 50,
+                    \"top\": 120,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"upperback\": {
+                    \"id\": null,
+                    \"textvalue\": \"SEOUL NAT'L\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 25,
+                    \"left\": 135,
+                    \"top\": 125,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"middleback\": {
+                    \"id\": null,
+                    \"textvalue\": \"UNIVERSITY\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 20,
+                    \"left\": 155,
+                    \"top\": 155,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"lowerback\": {
+                    \"id\": null,
+                    \"textvalue\": \"hi\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 15,
+                    \"left\": 150,
+                    \"top\": 190,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                }
+            },
+            \"logo\": {
+                \"front\": {
+                    \"id\": null,
+                    \"src\": \"hi\",
+                    \"width\": 571,
+                    \"height\": 589,
+                    \"left\": 340,
+                    \"top\": 180,
+                    \"scaleX\": 1,
+                    \"scaleY\": 1
+                },
+                \"back\": {
+                    \"id\": null,
+                    \"src\": \"hi\",
+                    \"width\": 571,
+                    \"height\": 589,
+                    \"left\": 215,
+                    \"top\": 280,
+                    \"scaleX\": 1,
+                    \"scaleY\": 1
+                }
+            },
+            \"image\": {
+                \"frontImg\": null,
+                \"backImg\": null
+            }
+        }"""
+        self.client.put(path='/', data=design_data, content_type='application/json')
+        self.client.logout()
+        self.group = Group.objects.get(group_name='post_group')
+
     # Post Design without Login
     # Post Design to Group not Joined
     def test_without_auth(self):
         self.client.logout()
-        self.assertEqual(1,1)
+        response = self.client.get('/groups/'+str(self.group.id)+'/post/'+str(self.design_id1)+'/')
+        self.assertEqual(response.status_code//100, 4)
+        self.client.login(username='post2',password='pass')
+        response = self.client.get('/groups/'+str(self.group.id)+'/post/'+str(self.design_id2)+'/')
+        self.assertEqual(response.status_code//100, 4)
+        self.client.logout()
     
     # Post Design
     def test_post_design(self):
-        self.assertEqual(1,1)
+        self.client.login(username='post1',password='pass')
+        response = self.client.get('/groups/'+str(self.group.id)+'/post/'+str(self.design_id1)+'/')
+        self.assertEqual(response.status_code//100, 2)
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        self.assertEqual(data['group'], self.group.id)
+        design = Design.objects.get(id=data['id'])
+        self.assertEquals(design.group, self.group)
+        self.client.logout()
 
     # Post UnExisting Design
     # Post Design to UnExisting Group
     def test_unexisting(self):
-        self.assertEqual(1,1)
+        self.client.login(username='post1',password='pass')
+        did = 100
+        try:
+            design = Design.objects.get(id=did)
+            self.assertEqual(1, 2)
+        except Design.DoesNotExist:
+            pass
+        response = self.client.get('/groups/'+str(self.group.id)+'/post/'+str(did)+'/')
+        self.assertEqual(response.status_code//100, 4)
+        gid = 100
+        try:
+            group = Group.objects.get(id=gid)
+            self.assertEqual(1, 2)
+        except Group.DoesNotExist:
+            pass
+        response = self.client.get('/groups/'+str(gid)+'/post/'+str(self.design_id1)+'/')
+        self.assertEqual(response.status_code//100, 4)
 
 ## Group Detail
 class GroupDetailCase(TestCase):
+    def setUp(self):
+        self.client.post('/users/', {'username': 'detail1', 'password': 'pass'})
+        self.client.post('/users/', {'username': 'detail2', 'password': 'pass'})
+        self.client.login(username='detail1',password='pass')
+        self.client.post('/create_group/', "{\"grouptype\": \"MJ\", \"groupname\": \"detail_group\"}", content_type='application/json')
+        self.group = Group.objects.get(group_name='detail_group')
+        response = self.client.get('/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        design_id1 = data['id']
+        design_data = """{
+            \"id\": """ + str(design_id1) + """,
+            \"design\": {
+                \"body\": \"#fcfcfc\",
+                \"button\": \"#fcfcfc\",
+                \"sleeve\": \"#fcfcfc\",
+                \"banding\": \"#fcfcfc\",
+                \"stripe\": \"#fcfcfc\"
+            },
+            \"text\": {
+                \"frontchest\": {
+                    \"id\": null,
+                    \"textvalue\": \"S\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#3f51b5\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 50,
+                    \"left\": 250,
+                    \"top\": 110,
+                    \"stroke\": \"#000000\",
+                    \"strokeWidth\": 2
+                },
+                \"rightarm\": {
+                    \"id\": null,
+                    \"textvalue\": \"19\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#607d8b\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 50,
+                    \"left\": 50,
+                    \"top\": 120,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"upperback\": {
+                    \"id\": null,
+                    \"textvalue\": \"SEOUL NAT'L\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 25,
+                    \"left\": 135,
+                    \"top\": 125,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"middleback\": {
+                    \"id\": null,
+                    \"textvalue\": \"UNIVERSITY\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 20,
+                    \"left\": 155,
+                    \"top\": 155,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"lowerback\": {
+                    \"id\": null,
+                    \"textvalue\": \"hi\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 15,
+                    \"left\": 150,
+                    \"top\": 190,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                }
+            },
+            \"logo\": {
+                \"front\": {
+                    \"id\": null,
+                    \"src\": \"hi\",
+                    \"width\": 571,
+                    \"height\": 589,
+                    \"left\": 340,
+                    \"top\": 180,
+                    \"scaleX\": 1,
+                    \"scaleY\": 1
+                },
+                \"back\": {
+                    \"id\": null,
+                    \"src\": \"hi\",
+                    \"width\": 571,
+                    \"height\": 589,
+                    \"left\": 215,
+                    \"top\": 280,
+                    \"scaleX\": 1,
+                    \"scaleY\": 1
+                }
+            },
+            \"image\": {
+                \"frontImg\": null,
+                \"backImg\": null
+            }
+        }"""
+        self.client.put(path='/', data=design_data, content_type='application/json')
+        response = self.client.get('/groups/'+str(self.group.id)+'/post/'+str(design_id1)+'/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        self.group_design_id1 = data['id']
+        response = self.client.delete('/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        design_id2 = data['id']
+        design_data = """{
+            \"id\": """ + str(design_id2) + """,
+            \"design\": {
+                \"body\": \"#fcfcfc\",
+                \"button\": \"#fcfcfc\",
+                \"sleeve\": \"#fcfcfc\",
+                \"banding\": \"#fcfcfc\",
+                \"stripe\": \"#fcfcfc\"
+            },
+            \"text\": {
+                \"frontchest\": {
+                    \"id\": null,
+                    \"textvalue\": \"S\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#3f51b5\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 50,
+                    \"left\": 250,
+                    \"top\": 110,
+                    \"stroke\": \"#000000\",
+                    \"strokeWidth\": 2
+                },
+                \"rightarm\": {
+                    \"id\": null,
+                    \"textvalue\": \"19\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#607d8b\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 50,
+                    \"left\": 50,
+                    \"top\": 120,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"upperback\": {
+                    \"id\": null,
+                    \"textvalue\": \"SEOUL NAT'L\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 25,
+                    \"left\": 135,
+                    \"top\": 125,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"middleback\": {
+                    \"id\": null,
+                    \"textvalue\": \"UNIVERSITY\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 20,
+                    \"left\": 155,
+                    \"top\": 155,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"lowerback\": {
+                    \"id\": null,
+                    \"textvalue\": \"hi\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 15,
+                    \"left\": 150,
+                    \"top\": 190,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                }
+            },
+            \"logo\": {
+                \"front\": {
+                    \"id\": null,
+                    \"src\": \"hi\",
+                    \"width\": 571,
+                    \"height\": 589,
+                    \"left\": 340,
+                    \"top\": 180,
+                    \"scaleX\": 1,
+                    \"scaleY\": 1
+                },
+                \"back\": {
+                    \"id\": null,
+                    \"src\": \"hi\",
+                    \"width\": 571,
+                    \"height\": 589,
+                    \"left\": 215,
+                    \"top\": 280,
+                    \"scaleX\": 1,
+                    \"scaleY\": 1
+                }
+            },
+            \"image\": {
+                \"frontImg\": null,
+                \"backImg\": null
+            }
+        }"""
+        self.client.put(path='/', data=design_data, content_type='application/json')
+        response = self.client.get('/groups/'+str(self.group.id)+'/post/'+str(design_id2)+'/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        self.group_design_id2 = data['id']
+        self.client.logout()
+
     # Get Design without Login
     # Get Designs of Group not Joined
     def test_without_auth(self):
         self.client.logout()
-        self.assertEqual(1,1)
+        response = self.client.get('groups/'+str(self.group.id)+'/')
+        self.assertEqual(response.status_code//100, 4)
             
     # Get Designs
     def test_group_detail(self):
-        self.assertEqual(1,1)
+        self.client.login(username='detail1',password='pass')
+        response = self.client.get('/groups/'+str(self.group.id)+'/')
+        self.assertEqual(response.status_code//100, 2)
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        response_designs = []
+        for design in data:
+            try:
+                response_designs.append(Design.objects.get(id=design['id']))
+            except Design.DoesNotExist:
+                self.assertEqual(1, 2)
+        for design in Design.objects.all().filter(group=self.group):
+            self.assertTrue(design in response_designs)
+        self.client.logout()
+
+        self.client.login(username='detail2',password='pass')
+        response = self.client.get('/groups/'+str(self.group.id)+'/')
+        self.assertEqual(response.status_code//100, 4)
 
     # Get Designs of UnExisting Group
     def test_unexisting(self):
-        self.assertEqual(1,1)
+        self.client.login(username='detail1',password='pass')
+        gid = 100
+        try:
+            group = Group.objects.get(id=gid)
+            self.assertEqual(1, 2)
+        except Group.DoesNotExist:
+            pass
+        response = self.client.get('/groups/'+str(gid)+'/')
+        self.assertEqual(response.status_code//100, 4)
 
 ## Delete Design
 class DeleteDesignCase(TestCase):
+    def setUp(self):
+        self.client.post('/users/', {'username': 'delete1', 'password': 'pass'})
+        self.client.post('/users/', {'username': 'delete2', 'password': 'pass'})
+        self.client.login(username='delete1',password='pass')
+        self.client.post('/create_group/', "{\"grouptype\": \"MJ\", \"groupname\": \"delete_group\"}", content_type='application/json')
+        self.group = Group.objects.get(group_name='delete_group')
+        response = self.client.get('/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        design_id1 = data['id']
+        design_data = """{
+            \"id\": """ + str(design_id1) + """,
+            \"design\": {
+                \"body\": \"#fcfcfc\",
+                \"button\": \"#fcfcfc\",
+                \"sleeve\": \"#fcfcfc\",
+                \"banding\": \"#fcfcfc\",
+                \"stripe\": \"#fcfcfc\"
+            },
+            \"text\": {
+                \"frontchest\": {
+                    \"id\": null,
+                    \"textvalue\": \"S\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#3f51b5\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 50,
+                    \"left\": 250,
+                    \"top\": 110,
+                    \"stroke\": \"#000000\",
+                    \"strokeWidth\": 2
+                },
+                \"rightarm\": {
+                    \"id\": null,
+                    \"textvalue\": \"19\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#607d8b\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 50,
+                    \"left\": 50,
+                    \"top\": 120,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"upperback\": {
+                    \"id\": null,
+                    \"textvalue\": \"SEOUL NAT'L\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 25,
+                    \"left\": 135,
+                    \"top\": 125,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"middleback\": {
+                    \"id\": null,
+                    \"textvalue\": \"UNIVERSITY\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 20,
+                    \"left\": 155,
+                    \"top\": 155,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"lowerback\": {
+                    \"id\": null,
+                    \"textvalue\": \"hi\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 15,
+                    \"left\": 150,
+                    \"top\": 190,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                }
+            },
+            \"logo\": {
+                \"front\": {
+                    \"id\": null,
+                    \"src\": \"hi\",
+                    \"width\": 571,
+                    \"height\": 589,
+                    \"left\": 340,
+                    \"top\": 180,
+                    \"scaleX\": 1,
+                    \"scaleY\": 1
+                },
+                \"back\": {
+                    \"id\": null,
+                    \"src\": \"hi\",
+                    \"width\": 571,
+                    \"height\": 589,
+                    \"left\": 215,
+                    \"top\": 280,
+                    \"scaleX\": 1,
+                    \"scaleY\": 1
+                }
+            },
+            \"image\": {
+                \"frontImg\": null,
+                \"backImg\": null
+            }
+        }"""
+        self.client.put(path='/', data=design_data, content_type='application/json')
+        response = self.client.get('/groups/'+str(self.group.id)+'/post/'+str(design_id1)+'/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        self.group_design_id1 = data['id']
+        response = self.client.delete('/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        design_id2 = data['id']
+        design_data = """{
+            \"id\": """ + str(design_id2) + """,
+            \"design\": {
+                \"body\": \"#fcfcfc\",
+                \"button\": \"#fcfcfc\",
+                \"sleeve\": \"#fcfcfc\",
+                \"banding\": \"#fcfcfc\",
+                \"stripe\": \"#fcfcfc\"
+            },
+            \"text\": {
+                \"frontchest\": {
+                    \"id\": null,
+                    \"textvalue\": \"S\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#3f51b5\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 50,
+                    \"left\": 250,
+                    \"top\": 110,
+                    \"stroke\": \"#000000\",
+                    \"strokeWidth\": 2
+                },
+                \"rightarm\": {
+                    \"id\": null,
+                    \"textvalue\": \"19\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#607d8b\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 50,
+                    \"left\": 50,
+                    \"top\": 120,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"upperback\": {
+                    \"id\": null,
+                    \"textvalue\": \"SEOUL NAT'L\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 25,
+                    \"left\": 135,
+                    \"top\": 125,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"middleback\": {
+                    \"id\": null,
+                    \"textvalue\": \"UNIVERSITY\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 20,
+                    \"left\": 155,
+                    \"top\": 155,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"lowerback\": {
+                    \"id\": null,
+                    \"textvalue\": \"hi\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 15,
+                    \"left\": 150,
+                    \"top\": 190,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                }
+            },
+            \"logo\": {
+                \"front\": {
+                    \"id\": null,
+                    \"src\": \"hi\",
+                    \"width\": 571,
+                    \"height\": 589,
+                    \"left\": 340,
+                    \"top\": 180,
+                    \"scaleX\": 1,
+                    \"scaleY\": 1
+                },
+                \"back\": {
+                    \"id\": null,
+                    \"src\": \"hi\",
+                    \"width\": 571,
+                    \"height\": 589,
+                    \"left\": 215,
+                    \"top\": 280,
+                    \"scaleX\": 1,
+                    \"scaleY\": 1
+                }
+            },
+            \"image\": {
+                \"frontImg\": null,
+                \"backImg\": null
+            }
+        }"""
+        self.client.put(path='/', data=design_data, content_type='application/json')
+        response = self.client.get('/groups/'+str(self.group.id)+'/post/'+str(design_id2)+'/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        self.group_design_id2 = data['id']
+        self.client.logout()
+        self.client.login(username='delete2',password='pass')
+        self.client.get('/join_group/' + str(self.group.id) + '/')
+        self.client.logout()
+
     # Delete Design without Login
     # Unauthorized Delete
     def test_without_auth(self):
         self.client.logout()
-        self.assertEqual(1,1)
+        response = self.client.get('/groups/delete/'+str(self.group_design_id1)+'/')
+        self.assertEqual(response.status_code//100, 4)
+        self.client.login(username='delete2',password='pass')
+        response = self.client.get('/groups/delete/'+str(self.group_design_id2)+'/')
+        self.assertEqual(response.status_code//100, 4)
+        self.client.logout()
 
     # Owner Delete Design
     def test_design_delete(self):
-        self.assertEqual(1,1)
+        self.client.login(username='delete1',password='pass')
+        response = self.client.get('/groups/delete/'+str(self.group_design_id1)+'/')
+        self.assertEqual(response.status_code//100, 2)
+        self.client.logout()
+        try:
+            design = Design.objects.get(id=self.group_design_id1)
+            self.assertEqual(1, 2)
+        except Design.DoesNotExist:
+            pass
+
     
     # Admin Delete Design
     def test_admin(self):
-        self.assertEqual(1,1)
+        user = User.objects.get(username='delete2')
+        self.client.login(username='delete1',password='pass')
+        response = self.client.put('/groups/' + str(self.group.id) + '/members/' + str(user.id) + '/')
+        self.client.logout()
+        self.client.login(username='delete2',password='pass')
+        response = self.client.get('/groups/delete/'+str(self.group_design_id2)+'/')
+        self.assertEqual(response.status_code//100, 2)
+        self.client.logout()
+        try:
+            design = Design.objects.get(id=self.group_design_id2)
+            self.assertEqual(1, 2)
+        except Design.DoesNotExist:
+            pass
+
 
     # Delete UnExisting Design
     def test_unexisting(self):
-        self.assertEqual(1,1)
+        did=100
+        try:
+            design = Design.objects.get(id=did)
+            self.assertEqual(1, 2)
+        except Design.DoesNotExist:
+            pass
+        self.client.login(username='delete1',password='pass')
+        response = self.client.get('/groups/delete/'+str(did)+'/')
+        self.assertEqual(response.status_code//100, 4)
+        self.client.logout()
 
 ## Like/UnLike Design
 class LikeDesignCase(TestCase):
+    def setUp(self):
+        self.client.post('/users/', {'username': 'like1', 'password': 'pass'})
+        self.client.post('/users/', {'username': 'like2', 'password': 'pass'})
+        self.client.login(username='like1',password='pass')
+        self.client.post('/create_group/', "{\"grouptype\": \"MJ\", \"groupname\": \"like_group\"}", content_type='application/json')
+        self.group = Group.objects.get(group_name='like_group')
+        response = self.client.get('/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        design_id = data['id']
+        design_data = """{
+            \"id\": """ + str(design_id) + """,
+            \"design\": {
+                \"body\": \"#fcfcfc\",
+                \"button\": \"#fcfcfc\",
+                \"sleeve\": \"#fcfcfc\",
+                \"banding\": \"#fcfcfc\",
+                \"stripe\": \"#fcfcfc\"
+            },
+            \"text\": {
+                \"frontchest\": {
+                    \"id\": null,
+                    \"textvalue\": \"S\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#3f51b5\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 50,
+                    \"left\": 250,
+                    \"top\": 110,
+                    \"stroke\": \"#000000\",
+                    \"strokeWidth\": 2
+                },
+                \"rightarm\": {
+                    \"id\": null,
+                    \"textvalue\": \"19\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#607d8b\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 50,
+                    \"left\": 50,
+                    \"top\": 120,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"upperback\": {
+                    \"id\": null,
+                    \"textvalue\": \"SEOUL NAT'L\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 25,
+                    \"left\": 135,
+                    \"top\": 125,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"middleback\": {
+                    \"id\": null,
+                    \"textvalue\": \"UNIVERSITY\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 20,
+                    \"left\": 155,
+                    \"top\": 155,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"lowerback\": {
+                    \"id\": null,
+                    \"textvalue\": \"hi\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 15,
+                    \"left\": 150,
+                    \"top\": 190,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                }
+            },
+            \"logo\": {
+                \"front\": {
+                    \"id\": null,
+                    \"src\": \"hi\",
+                    \"width\": 571,
+                    \"height\": 589,
+                    \"left\": 340,
+                    \"top\": 180,
+                    \"scaleX\": 1,
+                    \"scaleY\": 1
+                },
+                \"back\": {
+                    \"id\": null,
+                    \"src\": \"hi\",
+                    \"width\": 571,
+                    \"height\": 589,
+                    \"left\": 215,
+                    \"top\": 280,
+                    \"scaleX\": 1,
+                    \"scaleY\": 1
+                }
+            },
+            \"image\": {
+                \"frontImg\": null,
+                \"backImg\": null
+            }
+        }"""
+        self.client.put(path='/', data=design_data, content_type='application/json')
+        response = self.client.get('/groups/'+str(self.group.id)+'/post/'+str(design_id)+'/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        self.group_design_id = data['id']
+        self.client.logout()
+
     # Like Design without Login
     # Non-Member Like Design
     def test_without_auth(self):
         self.client.logout()
-        self.assertEqual(1,1)
+        response = self.client.get('/groups/like/'+str(self.group_design_id)+'/')
+        self.assertEqual(response.status_code//100, 4)
+        self.client.login(username='like2',password='pass')
+        response = self.client.get('/groups/like/'+str(self.group_design_id)+'/')
+        self.assertEqual(response.status_code//100, 4)
+        self.client.logout()
 
     # Like Design
     # UnLike Design
     def test_like_design(self):
-        self.assertEqual(1,1)
+        design = Design.objects.get(id=self.group_design_id)
+        user = User.objects.get(username="like1")
+        self.assertEqual(design.likes, 0)
+        self.assertTrue(user not in design.who.all())
+        self.client.login(username='like1',password='pass')
+        response = self.client.get('/groups/like/'+str(self.group_design_id)+'/')
+        self.assertEqual(response.status_code//100, 2)
+        design = Design.objects.get(id=self.group_design_id)
+        self.assertEqual(design.likes, 1)
+        self.assertTrue(user in design.who.all())
+        response = self.client.get('/groups/unlike/'+str(self.group_design_id)+'/')
+        self.assertEqual(response.status_code//100, 2)
+        design = Design.objects.get(id=self.group_design_id)
+        self.assertEqual(design.likes, 0)
+        self.assertTrue(user not in design.who.all())
+        self.client.logout()
 
     # Double Like Design
     def test_with_dups(self):
-        self.assertEqual(1,1)
+        self.client.login(username='like1',password='pass')
+        response = self.client.get('/groups/like/'+str(self.group_design_id)+'/')
+        response = self.client.get('/groups/like/'+str(self.group_design_id)+'/')
+        self.assertEqual(response.status_code//100, 4)
+        self.client.logout()
 
 ## Add Comment
 class AddCommentCase(TestCase):
+    def setUp(self):
+        self.client.post('/users/', {'username': 'comment1', 'password': 'pass'})
+        self.client.post('/users/', {'username': 'comment2', 'password': 'pass'})
+        self.client.login(username='comment1',password='pass')
+        self.client.post('/create_group/', "{\"grouptype\": \"MJ\", \"groupname\": \"comment_group\"}", content_type='application/json')
+        self.group = Group.objects.get(group_name='comment_group')
+        response = self.client.get('/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        design_id = data['id']
+        design_data = """{
+            \"id\": """ + str(design_id) + """,
+            \"design\": {
+                \"body\": \"#fcfcfc\",
+                \"button\": \"#fcfcfc\",
+                \"sleeve\": \"#fcfcfc\",
+                \"banding\": \"#fcfcfc\",
+                \"stripe\": \"#fcfcfc\"
+            },
+            \"text\": {
+                \"frontchest\": {
+                    \"id\": null,
+                    \"textvalue\": \"S\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#3f51b5\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 50,
+                    \"left\": 250,
+                    \"top\": 110,
+                    \"stroke\": \"#000000\",
+                    \"strokeWidth\": 2
+                },
+                \"rightarm\": {
+                    \"id\": null,
+                    \"textvalue\": \"19\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#607d8b\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 50,
+                    \"left\": 50,
+                    \"top\": 120,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"upperback\": {
+                    \"id\": null,
+                    \"textvalue\": \"SEOUL NAT'L\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 25,
+                    \"left\": 135,
+                    \"top\": 125,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"middleback\": {
+                    \"id\": null,
+                    \"textvalue\": \"UNIVERSITY\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 20,
+                    \"left\": 155,
+                    \"top\": 155,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"lowerback\": {
+                    \"id\": null,
+                    \"textvalue\": \"hi\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 15,
+                    \"left\": 150,
+                    \"top\": 190,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                }
+            },
+            \"logo\": {
+                \"front\": {
+                    \"id\": null,
+                    \"src\": \"hi\",
+                    \"width\": 571,
+                    \"height\": 589,
+                    \"left\": 340,
+                    \"top\": 180,
+                    \"scaleX\": 1,
+                    \"scaleY\": 1
+                },
+                \"back\": {
+                    \"id\": null,
+                    \"src\": \"hi\",
+                    \"width\": 571,
+                    \"height\": 589,
+                    \"left\": 215,
+                    \"top\": 280,
+                    \"scaleX\": 1,
+                    \"scaleY\": 1
+                }
+            },
+            \"image\": {
+                \"frontImg\": null,
+                \"backImg\": null
+            }
+        }"""
+        self.client.put(path='/', data=design_data, content_type='application/json')
+        response = self.client.get('/groups/'+str(self.group.id)+'/post/'+str(design_id)+'/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        self.group_design_id = data['id']
+        self.client.logout()
+
     # Add Comment without Login
     def test_without_auth(self):
         self.client.logout()
-        self.assertEqual(1,1)
+        response = self.client.post('/groups/comment/'+str(self.group_design_id)+'/', "{\"name\":\"name\",\"comment\":\"hi\"}", content_type='application/json')
+        self.assertEqual(response.status_code//100, 4)
     
     # Add Comment
     # Non-Member Add Comment
     def test_add_comment(self):
-        self.assertEqual(1,1)
+        self.client.login(username='comment1',password='pass')
+        response = self.client.post('/groups/comment/'+str(self.group_design_id)+'/', "{\"name\":\"name\",\"comment\":\"hi\"}", content_type='application/json')
+        self.assertEqual(response.status_code//100, 2)
+        self.client.logout()
+        self.client.login(username='comment2',password='pass')
+        response = self.client.post('/groups/comment/'+str(self.group_design_id)+'/', "{\"name\":\"name\",\"comment\":\"hi\"}", content_type='application/json')
+        self.assertEqual(response.status_code//100, 2)
+        self.client.logout()
 
 ## Like/Unlike Comment
-class LikeDesignCase(TestCase):
+class LikeCommentCase(TestCase):
+    def setUp(self):
+        self.client.post('/users/', {'username': 'likecomment1', 'password': 'pass'})
+        self.client.post('/users/', {'username': 'likecomment2', 'password': 'pass'})
+        self.client.login(username='likecomment1',password='pass')
+        self.client.post('/create_group/', "{\"grouptype\": \"MJ\", \"groupname\": \"likecomment_group\"}", content_type='application/json')
+        self.group = Group.objects.get(group_name='likecomment_group')
+        response = self.client.get('/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        design_id = data['id']
+        design_data = """{
+            \"id\": """ + str(design_id) + """,
+            \"design\": {
+                \"body\": \"#fcfcfc\",
+                \"button\": \"#fcfcfc\",
+                \"sleeve\": \"#fcfcfc\",
+                \"banding\": \"#fcfcfc\",
+                \"stripe\": \"#fcfcfc\"
+            },
+            \"text\": {
+                \"frontchest\": {
+                    \"id\": null,
+                    \"textvalue\": \"S\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#3f51b5\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 50,
+                    \"left\": 250,
+                    \"top\": 110,
+                    \"stroke\": \"#000000\",
+                    \"strokeWidth\": 2
+                },
+                \"rightarm\": {
+                    \"id\": null,
+                    \"textvalue\": \"19\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#607d8b\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 50,
+                    \"left\": 50,
+                    \"top\": 120,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"upperback\": {
+                    \"id\": null,
+                    \"textvalue\": \"SEOUL NAT'L\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 25,
+                    \"left\": 135,
+                    \"top\": 125,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"middleback\": {
+                    \"id\": null,
+                    \"textvalue\": \"UNIVERSITY\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 20,
+                    \"left\": 155,
+                    \"top\": 155,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"lowerback\": {
+                    \"id\": null,
+                    \"textvalue\": \"hi\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 15,
+                    \"left\": 150,
+                    \"top\": 190,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                }
+            },
+            \"logo\": {
+                \"front\": {
+                    \"id\": null,
+                    \"src\": \"hi\",
+                    \"width\": 571,
+                    \"height\": 589,
+                    \"left\": 340,
+                    \"top\": 180,
+                    \"scaleX\": 1,
+                    \"scaleY\": 1
+                },
+                \"back\": {
+                    \"id\": null,
+                    \"src\": \"hi\",
+                    \"width\": 571,
+                    \"height\": 589,
+                    \"left\": 215,
+                    \"top\": 280,
+                    \"scaleX\": 1,
+                    \"scaleY\": 1
+                }
+            },
+            \"image\": {
+                \"frontImg\": null,
+                \"backImg\": null
+            }
+        }"""
+        self.client.put(path='/', data=design_data, content_type='application/json')
+        response = self.client.get('/groups/'+str(self.group.id)+'/post/'+str(design_id)+'/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        self.group_design_id = data['id']
+        response = self.client.post('/groups/comment/'+str(self.group_design_id)+'/', "{\"name\":\"name\",\"comment\":\"hi\"}", content_type='application/json')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        self.comment_id = data[0]['id']
+        self.client.logout()
+
     # Like Comment without Login
     def test_without_auth(self):
         self.client.logout()
-        self.assertEqual(1,1)
+        response = self.client.get('/groups/comment/like/'+str(self.comment_id)+'/')
+        self.assertEqual(response.status_code//100, 4)
 
     # Like Comment
     # UnLike Comment
     # Non-Member Like Comment
     def test_like_comment(self):
-        self.assertEqual(1,1)
+        comment = Comment.objects.get(id=self.comment_id)
+        user1 = User.objects.get(username="likecomment1")
+        user2 = User.objects.get(username="likecomment2")
+        self.assertEqual(comment.likes, 0)
+        self.assertTrue(user1 not in comment.who_c.all())
+        self.client.login(username='likecomment1',password='pass')
+        response = self.client.get('/groups/comment/like/'+str(self.comment_id)+'/')
+        self.assertEqual(response.status_code//100, 2)
+        comment = Comment.objects.get(id=self.comment_id)
+        self.assertEqual(comment.likes, 1)
+        self.assertTrue(user1 in comment.who_c.all())
+        response = self.client.get('/groups/comment/unlike/'+str(self.comment_id)+'/')
+        self.assertEqual(response.status_code//100, 2)
+        comment = Comment.objects.get(id=self.comment_id)
+        self.assertEqual(comment.likes, 0)
+        self.assertTrue(user1 not in comment.who_c.all())
+        self.client.logout()
+        self.client.login(username='likecomment2',password='pass')
+        self.assertTrue(user2 not in comment.who_c.all())
+        response = self.client.get('/groups/comment/like/'+str(self.comment_id)+'/')
+        self.assertEqual(response.status_code//100, 2)
+        comment = Comment.objects.get(id=self.comment_id)
+        self.assertEqual(comment.likes, 1)
+        self.assertTrue(user2 in comment.who_c.all())
 
     # Double Like Comment
     def test_with_dups(self):
-        self.assertEqual(1,1)
+        self.client.login(username='likecomment1',password='pass')
+        response = self.client.get('/groups/comment/like/'+str(self.comment_id)+'/')
+        response = self.client.get('/groups/comment/like/'+str(self.comment_id)+'/')
+        self.assertEqual(response.status_code//100, 4)
 
 ## Update/Delete Comment
 class UpdateCommentCase(TestCase):
+    def setUp(self):
+        self.client.post('/users/', {'username': 'updatecomment1', 'password': 'pass'})
+        self.client.post('/users/', {'username': 'updatecomment2', 'password': 'pass'})
+        self.client.login(username='updatecomment1',password='pass')
+        self.client.post('/create_group/', "{\"grouptype\": \"MJ\", \"groupname\": \"updatecomment_group\"}", content_type='application/json')
+        self.group = Group.objects.get(group_name='updatecomment_group')
+        response = self.client.get('/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        design_id = data['id']
+        design_data = """{
+            \"id\": """ + str(design_id) + """,
+            \"design\": {
+                \"body\": \"#fcfcfc\",
+                \"button\": \"#fcfcfc\",
+                \"sleeve\": \"#fcfcfc\",
+                \"banding\": \"#fcfcfc\",
+                \"stripe\": \"#fcfcfc\"
+            },
+            \"text\": {
+                \"frontchest\": {
+                    \"id\": null,
+                    \"textvalue\": \"S\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#3f51b5\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 50,
+                    \"left\": 250,
+                    \"top\": 110,
+                    \"stroke\": \"#000000\",
+                    \"strokeWidth\": 2
+                },
+                \"rightarm\": {
+                    \"id\": null,
+                    \"textvalue\": \"19\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#607d8b\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 50,
+                    \"left\": 50,
+                    \"top\": 120,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"upperback\": {
+                    \"id\": null,
+                    \"textvalue\": \"SEOUL NAT'L\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 25,
+                    \"left\": 135,
+                    \"top\": 125,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"middleback\": {
+                    \"id\": null,
+                    \"textvalue\": \"UNIVERSITY\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 20,
+                    \"left\": 155,
+                    \"top\": 155,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                },
+                \"lowerback\": {
+                    \"id\": null,
+                    \"textvalue\": \"hi\",
+                    \"fontFamily\": \"arial\",
+                    \"fill\": \"#ffc107\",
+                    \"fontStyle\": \"bold\",
+                    \"fontSize\": 15,
+                    \"left\": 150,
+                    \"top\": 190,
+                    \"stroke\": \"\",
+                    \"strokeWidth\": 0
+                }
+            },
+            \"logo\": {
+                \"front\": {
+                    \"id\": null,
+                    \"src\": \"hi\",
+                    \"width\": 571,
+                    \"height\": 589,
+                    \"left\": 340,
+                    \"top\": 180,
+                    \"scaleX\": 1,
+                    \"scaleY\": 1
+                },
+                \"back\": {
+                    \"id\": null,
+                    \"src\": \"hi\",
+                    \"width\": 571,
+                    \"height\": 589,
+                    \"left\": 215,
+                    \"top\": 280,
+                    \"scaleX\": 1,
+                    \"scaleY\": 1
+                }
+            },
+            \"image\": {
+                \"frontImg\": null,
+                \"backImg\": null
+            }
+        }"""
+        self.client.put(path='/', data=design_data, content_type='application/json')
+        response = self.client.get('/groups/'+str(self.group.id)+'/post/'+str(design_id)+'/')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        self.group_design_id = data['id']
+        response = self.client.post('/groups/comment/'+str(self.group_design_id)+'/', "{\"name\":\"name\",\"comment\":\"hi\"}", content_type='application/json')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        self.comment_id1 = data[0]['id']
+        response = self.client.post('/groups/comment/'+str(self.group_design_id)+'/', "{\"name\":\"name\",\"comment\":\"hi\"}", content_type='application/json')
+        response.render()
+        stream = io.BytesIO(response.content)
+        data = JSONParser().parse(stream)
+        self.comment_id2 = data[0]['id']
+        self.client.logout()
+        self.client.login(username='updatecomment2', password='pass')
+        self.client.get('/join_group/' + str(self.group.id) + '/')
+        self.client.logout()
+
     # Edit Comment
     # Delete Comment
     def test_update_comment(self):
-        self.assertEqual(1,1)
+        comment_before = Comment.objects.get(id=self.comment_id1)
+        self.client.login(username='updatecomment1', password='pass')
+        response = self.client.put('/groups/comment/'+str(self.group_design_id)+'/'+str(self.comment_id1)+'/', "{\"comment\":\"hello\"}", content_type='application/json')
+        self.assertEqual(response.status_code//100, 2)
+        comment_after = Comment.objects.get(id=self.comment_id1)
+        self.assertEqual(comment_before.id, comment_after.id)
+        self.assertFalse(comment_before.comment == comment_after.comment)
+        response = self.client.delete('/groups/comment/'+str(self.group_design_id)+'/'+str(self.comment_id1)+'/')
+        self.assertEqual(response.status_code//100, 2)
+        try:
+            comment = Comment.objects.get(id=self.comment_id1)
+            self.assertEqual(1, 2)
+        except Comment.DoesNotExist:
+            pass
+        self.client.logout()
+        
 
     # Update Comment without Login
     # Non-Owner Update Comment
     def test_without_auth(self):
         self.client.logout()
-        self.assertEqual(1,1)
+        response = self.client.put('/groups/comment/'+str(self.group_design_id)+'/'+str(self.comment_id2)+'/', "{\"comment\":\"hello\"}", content_type='application/json')
+        self.assertEqual(response.status_code//100, 4)
+        self.client.login(username='updatecomment2', password='pass')
+        response = self.client.put('/groups/comment/'+str(self.group_design_id)+'/'+str(self.comment_id2)+'/', "{\"comment\":\"hello\"}", content_type='application/json')
+        self.assertEqual(response.status_code//100, 4)
+        self.client.logout()
 
     # Admin Update Comment
     def test_admin(self):
-        self.assertEqual(1,1)
+        user = User.objects.get(username="updatecomment2")
+        comment_before = Comment.objects.get(id=self.comment_id2)
+        self.client.login(username='updatecomment1', password='pass')
+        self.client.put('/groups/' + str(self.group.id) + '/members/' + str(user.id) + '/')
+        self.client.logout()
+        self.client.login(username='updatecomment2', password='pass')
+        response = self.client.put('/groups/comment/'+str(self.group_design_id)+'/'+str(self.comment_id2)+'/', "{\"comment\":\"hello\"}", content_type='application/json')
+        self.assertEqual(response.status_code//100, 2)
+        comment_after = Comment.objects.get(id=self.comment_id2)
+        self.assertEqual(comment_before.id, comment_after.id)
+        self.assertFalse(comment_before.comment == comment_after.comment)
+        response = self.client.delete('/groups/comment/'+str(self.group_design_id)+'/'+str(self.comment_id2)+'/')
+        self.assertEqual(response.status_code//100, 2)
+        try:
+            comment = Comment.objects.get(id=self.comment_id2)
+            self.assertEqual(1, 2)
+        except Comment.DoesNotExist:
+            pass
+        self.client.logout()

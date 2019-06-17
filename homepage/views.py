@@ -910,7 +910,7 @@ def update_comment(request, design_id, comment_id):
 
     if comment.design != design:
         return Response(status=status.HTTP_400_BAD_REQUEST)
-    if comment.writer != request.user or request.user not in comment.design.group.master.all():
+    if comment.writer != request.user and request.user not in comment.design.group.master.all():
         return Response(status=status.HTTP_403_FORBIDDEN)
     if request.method == 'DELETE':
         comment.delete()
