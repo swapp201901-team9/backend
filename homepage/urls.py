@@ -33,10 +33,6 @@ urlpatterns = [
     path('create_group/', views.create_group, name='create_group'),
     path('join_group/<int:group_id>/', views.join_group, name='join_group'),
     path('', views.main, name='main'),
-    # url(r'login/', views.login.as_view(), name='login'),
-    # url(r'logout/', views.logout.as_view(), name='logout'),
-    # url(r'join/', views.join.as_view(), name='join'),
-    # url(r'mypage/', views.mypage.as_view(), name='mypage'),
     ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
