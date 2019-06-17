@@ -576,6 +576,8 @@ def create_group(request):
         except Group.DoesNotExist:
             pass
         
+        if data['grouptype'] == 'UR':
+            return Response(status=status.HTTP_403_FORBIDDEN)
         group = Group()
         group.group_type = data['grouptype']
         group.group_name = data['groupname']
