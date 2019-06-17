@@ -183,7 +183,7 @@ def set_default_text_and_logo(design):
 
     if design.lower_back_text == None:
         lowerback = Text()
-        lowerback.textvalue = "Department of Computer Science"
+        lowerback.textvalue = "Department of\nComputer Science"
         lowerback.fontFamily = "arial"
         lowerback.fill = "#ffc107"
         lowerback.fontStyle = "bold"
@@ -882,6 +882,7 @@ def add_comment(request, design_id):
         comment = Comment()
         comment.writer = request.user
         comment.design = design
+        comment.name = request.data['name']
         comment.comment = request.data['comment']
         comment.save()
     
@@ -913,3 +914,55 @@ def update_comment(request, design_id, comment_id):
 
     c_set = Comment.objects.all().filter(design=design).order_by('created_at').reverse()
     return Response(CommentSerializer(c_set, user=request.user, many=True).data)
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticatedOrNothing,))
+def comment_like(request, comment_id):
+    if request.method == 'GET':
+        if request.user.id == None:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        try:
+            user = User.objects.get(username=request.user)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            comment = Comment.objects.get(id=comment_id)
+        except Comment.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        if request.user in comment.who_c.all():
+            return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+        
+        comment.who_c.add(user)
+        comment.likes = comment.likes + 1
+        comment.save()
+        
+        c_set = Comment.objects.all().filter(design=comment.design).order_by('created_at').reverse()
+        return Response(CommentSerializer(c_set, user=request.user, many=True).data)
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticatedOrNothing,))
+def comment_unlike(request, comment_id):
+    if request.method == 'GET':
+        if request.user.id == None:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        try:
+            user = User.objects.get(username=request.user)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            comment = Comment.objects.get(id=comment_id)
+        except Comment.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        if request.user not in comment.who_c.all():
+            return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+        
+        comment.who_c.remove(user)
+        comment.likes = comment.likes - 1
+        comment.save()
+        
+        c_set = Comment.objects.all().filter(design=comment.design).order_by('created_at').reverse()
+        return Response(CommentSerializer(c_set, user=request.user, many=True).data)

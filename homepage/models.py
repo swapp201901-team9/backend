@@ -45,6 +45,7 @@ class Group(models.Model):
         return self.group_name
 
 class Comment(models.Model):
+    name = models.TextField(default="anonymous", blank=True, null=True)
     writer = models.ForeignKey('auth.User', related_name="writer", on_delete=models.CASCADE)
     design = models.ForeignKey('Design', on_delete=models.CASCADE)
     comment = models.TextField(default="Good Job!", blank=True, null=True)
@@ -93,8 +94,12 @@ class Design(models.Model):
 
 class Logo(models.Model):
     src = models.TextField(default=DEFAULT_LOGO_BASE64, blank=True, null=True)
+    width = models.IntegerField(default=571)
+    height = models.IntegerField(default=589)
     left = models.IntegerField(default=0)
     top = models.IntegerField(default=0)
+    scaleX = models.IntegerField(default=1)
+    scaleY = models.IntegerField(default=1)
 
 class Text(models.Model):
     textvalue = models.CharField(max_length=50)
