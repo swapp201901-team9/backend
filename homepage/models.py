@@ -114,6 +114,11 @@ class Text(models.Model):
         default="#fcfcfc",
     )
     strokeWidth = models.IntegerField(default=0)
+    scaleX = models.IntegerField(default=1)
+    scaleY = models.IntegerField(default=1)
+    width = models.IntegerField(default=0)
+    height = models.IntegerField(default=0)
+
 
 class Profile(models.Model):
     user = models.OneToOneField('auth.User', on_delete=models.CASCADE,primary_key=True)
