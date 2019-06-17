@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from .default_logo import DEFAULT_LOGO_BASE64
+from .default_image_url import DEFAULT_IMG_FRONT_URL, DEFAULT_IMG_BACK_URL
 from .models import *
 from .views import *
 
@@ -196,26 +197,26 @@ class DefaultDesignCase(TestCase):
         self.assertEqual(data['text']['lowerback']['fill'], "#ffc107")
         self.assertEqual(data['text']['lowerback']['fontStyle'], "bold")
         self.assertEqual(data['text']['lowerback']['fontSize'], 15)
-        self.assertEqual(data['text']['lowerback']['left'], 150)
-        self.assertEqual(data['text']['lowerback']['top'], 190)
+        self.assertEqual(data['text']['lowerback']['left'], 151)
+        self.assertEqual(data['text']['lowerback']['top'], 256)
         self.assertEqual(data['text']['lowerback']['stroke'], "")
         self.assertEqual(data['text']['lowerback']['strokeWidth'], 0)
         self.assertEqual(data['logo']['front']['src'], DEFAULT_LOGO_BASE64)
         self.assertEqual(data['logo']['front']['width'], 571)
         self.assertEqual(data['logo']['front']['height'], 589)
-        self.assertEqual(data['logo']['front']['left'], 340)
-        self.assertEqual(data['logo']['front']['top'], 180)
+        self.assertEqual(data['logo']['front']['left'], 357)
+        self.assertEqual(data['logo']['front']['top'], 152)
         self.assertEqual(data['logo']['front']['scaleX'], 1)
         self.assertEqual(data['logo']['front']['scaleY'], 1)
         self.assertEqual(data['logo']['back']['src'], DEFAULT_LOGO_BASE64)
         self.assertEqual(data['logo']['back']['width'], 571)
         self.assertEqual(data['logo']['back']['height'], 589)
-        self.assertEqual(data['logo']['back']['left'], 215)
-        self.assertEqual(data['logo']['back']['top'], 280)
+        self.assertEqual(data['logo']['back']['left'], 212)
+        self.assertEqual(data['logo']['back']['top'], 216)
         self.assertEqual(data['logo']['back']['scaleX'], 1)
         self.assertEqual(data['logo']['back']['scaleY'], 1)
-        self.assertEqual(data['image']['frontImg'], None)
-        self.assertEqual(data['image']['backImg'], None)
+        self.assertEqual(data['image']['frontImg'], DEFAULT_IMG_FRONT_URL)
+        self.assertEqual(data['image']['backImg'], DEFAULT_IMG_BACK_URL)
         self.assertEqual(data['likes'], 0)
         # id, group, owner should be null for non-authorized requests
         self.assertEqual(data['id'], None)
