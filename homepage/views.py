@@ -576,6 +576,8 @@ def create_group(request):
         except Group.DoesNotExist:
             pass
         
+        if data['grouptype'] == 'UR':
+            return Response(status=status.HTTP_403_FORBIDDEN)
         group = Group()
         group.group_type = data['grouptype']
         group.group_name = data['groupname']
@@ -610,7 +612,9 @@ def join_group(request, group_id):
             group = Group.objects.get(id=group_id)
         except Group.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        
+        if group.group_type == 'UR':
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+            
         if request.user.id == None:
             return Response(status=status.HTTP_403_FORBIDDEN)
         try:
@@ -618,6 +622,8 @@ def join_group(request, group_id):
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         
+        if user in group.users.all():
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         group.users.add(user)
         group_serializer = GroupSerializer(group)
         return Response(group_serializer.data)
@@ -904,11 +910,12 @@ def update_comment(request, design_id, comment_id):
 
     if comment.design != design:
         return Response(status=status.HTTP_400_BAD_REQUEST)
-    if comment.writer != request.user or request.user not in comment.design.group.master.all():
+    if comment.writer != request.user and request.user not in comment.design.group.master.all():
         return Response(status=status.HTTP_403_FORBIDDEN)
     if request.method == 'DELETE':
         comment.delete()
     if request.method == 'PUT':
+        comment.name = request.data['name']
         comment.comment = request.data['comment']
         comment.save()
 
