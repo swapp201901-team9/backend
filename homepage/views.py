@@ -128,7 +128,7 @@ def profile(request, username):
         return Response(status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_403_FORBIDDEN)
 
-def set_default_text_and_logo(design):
+def set_default_text_and_logo(design, logged_in):
     if design.front_chest_text == None:
         frontchest = Text()
         frontchest.textvalue = "S"
@@ -142,6 +142,8 @@ def set_default_text_and_logo(design):
         frontchest.height = 56.5
         frontchest.stroke = "#000000"
         frontchest.strokeWidth = 2
+        if logged_in:
+            frontchest.save()
         design.front_chest_text = frontchest
     
     if design.right_arm_text == None:
@@ -157,6 +159,8 @@ def set_default_text_and_logo(design):
         rightarm.height = 56.5
         rightarm.stroke = ""
         rightarm.strokeWidth = 0
+        if logged_in:
+            rightarm.save()
         design.right_arm_text = rightarm
 
     if design.upper_back_text == None:
@@ -172,6 +176,8 @@ def set_default_text_and_logo(design):
         upperback.height = 28.25
         upperback.stroke = ""
         upperback.strokeWidth = 0
+        if logged_in:
+            upperback.save()
         design.upper_back_text = upperback
 
     if design.middle_back_text == None:
@@ -187,6 +193,8 @@ def set_default_text_and_logo(design):
         middleback.width = 22.599999999999998
         middleback.stroke = ""
         middleback.strokeWidth = 0
+        if logged_in:
+            middleback.save()
         design.middle_back_text = middleback
 
     if design.lower_back_text == None:
@@ -202,19 +210,28 @@ def set_default_text_and_logo(design):
         lowerback.height = 36.611999999999995
         lowerback.stroke = ""
         lowerback.strokeWidth = 0
+        if logged_in:
+            lowerback.save()
         design.lower_back_text = lowerback
 
     if design.front_logo == None:
         frontlogo = Logo()
         frontlogo.left = 357
         frontlogo.top = 152
+        if logged_in:
+            frontlogo.save()
         design.front_logo = frontlogo
 
     if design.back_logo == None:
         backlogo = Logo()
         backlogo.left = 212
         backlogo.top = 216
+        if logged_in:
+            backlogo.save()
         design.back_logo = backlogo
+    
+    if logged_in:
+        design.save()
 
 def update_text_and_logo(text, logo, design):
     if design.front_chest_text != None:
@@ -415,7 +432,7 @@ def main(request):
                 user.recent = design
                 user.number += 1
                 user.save()
-        set_default_text_and_logo(design)
+        set_default_text_and_logo(design, request.user.id != None)
         design_serializer = UserDesignSerializer(design)
         return Response(design_serializer.data)
     
@@ -463,7 +480,7 @@ def main(request):
             user.number += 1
             user.save()
             
-        set_default_text_and_logo(design)
+        set_default_text_and_logo(design, request.user.id != None)
         design_serializer = UserDesignSerializer(design)
         return Response(design_serializer.data)
 
