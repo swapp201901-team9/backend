@@ -175,7 +175,7 @@ class UserDesignSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Design
-        fields = ('id', 'group', 'likes', 'design', 'text', 'logo', 'image')
+        fields = ('name', 'id', 'group', 'likes', 'design', 'text', 'logo', 'image')
 
 class CommentSerializer(serializers.ModelSerializer):
     auth = serializers.SerializerMethodField()
