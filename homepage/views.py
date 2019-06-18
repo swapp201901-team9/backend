@@ -671,9 +671,11 @@ def group_list_all(request):
         group_serializer = GroupSerializer(instance=groups, user=request.user, many=True)
         return Response(group_serializer.data)
 
-@api_view(['GET'])
+@api_view(['GET', 'PUT'])
 @permission_classes((IsAuthenticatedOrNothing,))
 def edit_design(request, design_id):
+    if request.user.id == None:
+        return Response(status=status.HTTP_403_FORBIDDEN)
     try:
         user = Profile.objects.get(user=request.user)
     except Profile.DoesNotExist:
@@ -685,13 +687,22 @@ def edit_design(request, design_id):
         return Response(status=status.HTTP_404_NOT_FOUND)
     if request.user != design.owner:
         return Response(status=status.HTTP_403_FORBIDDEN)
-    if design.group.group_type != 'UR' or request.user not in design.group.master.all():
-        return Response(status=status.HTTP_403_FORBIDDEN)
     
-    user.recent = design
-    user.save()
-    profile_serializer = ProfileSerializer(user)
-    return Response(profile_serializer.data)
+    if request.method == 'GET':
+        if design.group.group_type != 'UR' or request.user not in design.group.master.all():
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        user.recent = design
+        user.save()
+        profile_serializer = ProfileSerializer(user)
+        return Response(profile_serializer.data)
+    
+    if request.method == 'PUT':
+        data = json.loads(request.body.decode("utf-8")) 
+        design.name = data['name']
+        design.save()
+        design_serializer = UserDesignSerializer(design)
+        return Response(design_serializer.data)
 
 @csrf_exempt
 @api_view(['GET', 'PUT', 'DELETE'])
