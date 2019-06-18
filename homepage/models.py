@@ -51,14 +51,12 @@ class Comment(models.Model):
     design = models.ForeignKey('Design', on_delete=models.CASCADE)
     comment = models.TextField(default="Good Job!", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    likes = models.IntegerField(default=0)
     who_c = models.ManyToManyField('auth.User', related_name="who_c", blank=True)
 
 class Design(models.Model):
     name = models.CharField(max_length=50, blank=True, null=True)
     owner = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    likes = models.IntegerField(default=0)
     who = models.ManyToManyField('auth.User', related_name="who", blank=True)
     body = models.CharField(
         max_length=7,
