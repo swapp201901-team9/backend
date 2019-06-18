@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.core.files import File
 from django.contrib.auth.models import User
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.http import HttpResponseRedirect,HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics, status
@@ -552,7 +552,7 @@ def group_detail(request, group_id):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
         try:
-            designs = Design.objects.all().filter(group=group).order_by('likes').reverse()
+            designs = Design.objects.all().filter(group=group).annotate(likes=Count('who')).order_by('-likes')
         except Design.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         
@@ -827,7 +827,6 @@ def update_likes(request, design_id):
             return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
         
         design.who.add(user)
-        design.likes = design.likes + 1
         design.save()
         design_serializer = UserDesignSerializer(design)
         return Response(design_serializer.data)
@@ -853,7 +852,6 @@ def undo_likes(request, design_id):
             return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
         
         design.who.remove(user)
-        design.likes = design.likes - 1
         design.save()
         design_serializer = UserDesignSerializer(design)
         return Response(design_serializer.data)
@@ -958,7 +956,6 @@ def comment_like(request, comment_id):
             return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
         
         comment.who_c.add(user)
-        comment.likes = comment.likes + 1
         comment.save()
         
         c_set = Comment.objects.all().filter(design=comment.design).order_by('created_at').reverse()
@@ -984,7 +981,6 @@ def comment_unlike(request, comment_id):
             return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
         
         comment.who_c.remove(user)
-        comment.likes = comment.likes - 1
         comment.save()
         
         c_set = Comment.objects.all().filter(design=comment.design).order_by('created_at').reverse()
