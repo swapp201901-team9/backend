@@ -410,8 +410,10 @@ def main(request):
                 design = Design()
                 design.owner = request.user
                 design.group = user.user_group
+                design.name = 'new_design_'+str(user.number)
                 design.save()
                 user.recent = design
+                user.number += 1
                 user.save()
         set_default_text_and_logo(design)
         design_serializer = UserDesignSerializer(design)
@@ -428,6 +430,7 @@ def main(request):
         design_id=data['id']
         if design_id != user.recent.id:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+        user.recent.name=data['name']
         user.recent.body=data['design']['body']
         user.recent.sleeve=data['design']['sleeve']
         user.recent.button=data['design']['button']
@@ -454,8 +457,10 @@ def main(request):
             design = Design()
             design.owner = request.user
             design.group = user.user_group
+            design.name = 'new_design_'+str(user.number)
             design.save()
             user.recent = design
+            user.number += 1
             user.save()
             
         set_default_text_and_logo(design)
@@ -512,6 +517,7 @@ def post_design(request, group_id, design_id):
             return Response(status=status.HTTP_400_BAD_REQUEST)        
 
         post_design=Design()
+        post_design.name = design.name
         post_design.owner = request.user
         post_design.group = group
         post_design.body = design.body

@@ -55,6 +55,7 @@ class Comment(models.Model):
     who_c = models.ManyToManyField('auth.User', related_name="who_c", blank=True)
 
 class Design(models.Model):
+    name = models.CharField(max_length=50, blank=True, null=True)
     owner = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     likes = models.IntegerField(default=0)
@@ -123,6 +124,7 @@ class Text(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField('auth.User', on_delete=models.CASCADE,primary_key=True)
+    number = models.IntegerField(default=1)
     user_group = models.OneToOneField(
         Group,
         on_delete=models.CASCADE,
