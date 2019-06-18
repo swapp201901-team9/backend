@@ -153,9 +153,9 @@ def create_profile_and_group(sender, instance, created, **kwargs):
         group = Group()
         group.group_type = USER
         group.group_name = 'user_group_'+instance.username
-        group.save()
         group.master.add(instance)
         group.users.add(instance)
+        group.save()
 
         profile = Profile()
         profile.user=instance
