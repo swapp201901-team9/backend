@@ -1,5 +1,6 @@
 # Team 9 (SWPP201901)
-
+![icon](https://github.com/swapp201901-team9/frontend/blob/master/icon.jpg)
+![User Interface](https://github.com/swapp201901-team9/frontend/blob/master/documents/user%20interface.jpeg)
 We are Team 9 taking 'software development principles and design' course
 held in 2019-01.
 
@@ -89,6 +90,4 @@ http://ec2-13-125-245-176.ap-northeast-2.compute.amazonaws.com:3000/
 5) start 
 ```bash
   sudo python3 manage.py runserver
-```
-
 
