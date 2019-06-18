@@ -973,3 +973,17 @@ def comment_unlike(request, comment_id):
         
         c_set = Comment.objects.all().filter(design=comment.design).order_by('created_at').reverse()
         return Response(CommentSerializer(c_set, user=request.user, many=True).data)
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticatedOrNothing,))
+def get_profile(request):
+    if request.method == 'GET':
+        if request.user.id == None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        try:
+            profile = Profile.objects.get(user=request.user)
+        except Profile.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        profile_serializer = ProfileSerializer(profile)
+        return Response(profile_serializer.data)

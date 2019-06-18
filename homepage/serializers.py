@@ -43,7 +43,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     user= serializers.ReadOnlyField(source='user.username')
     class Meta:
         model = Profile
-        fields = ('user','recent')
+        fields = ('user','recent','user_group')
 
 class GroupSerializer(serializers.ModelSerializer):
     admin = serializers.SerializerMethodField()
