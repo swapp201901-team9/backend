@@ -138,6 +138,8 @@ def set_default_text_and_logo(design):
         frontchest.fontSize = 50
         frontchest.left = 250
         frontchest.top = 110
+        frontchest.width = 33.349609375
+        frontchest.height = 56.5
         frontchest.stroke = "#000000"
         frontchest.strokeWidth = 2
         design.front_chest_text = frontchest
@@ -151,6 +153,8 @@ def set_default_text_and_logo(design):
         rightarm.fontSize = 50
         rightarm.left = 46
         rightarm.top = 124
+        rightarm.width = 55.615234375
+        rightarm.height = 56.5
         rightarm.stroke = ""
         rightarm.strokeWidth = 0
         design.right_arm_text = rightarm
@@ -164,6 +168,8 @@ def set_default_text_and_logo(design):
         upperback.fontSize = 25
         upperback.left = 135
         upperback.top = 125
+        upperback.width = 163.80615234375
+        upperback.height = 28.25
         upperback.stroke = ""
         upperback.strokeWidth = 0
         design.upper_back_text = upperback
@@ -177,6 +183,8 @@ def set_default_text_and_logo(design):
         middleback.fontSize = 20
         middleback.left = 155
         middleback.top = 155
+        middleback.height = 120.01953125
+        middleback.width = 22.599999999999998
         middleback.stroke = ""
         middleback.strokeWidth = 0
         design.middle_back_text = middleback
@@ -190,6 +198,8 @@ def set_default_text_and_logo(design):
         lowerback.fontSize = 15
         lowerback.left = 151
         lowerback.top = 256
+        lowerback.width = 131.7041015625
+        lowerback.height = 36.611999999999995
         lowerback.stroke = ""
         lowerback.strokeWidth = 0
         design.lower_back_text = lowerback
