@@ -29,11 +29,11 @@ class AuthList(APIView):
         }
         return Response(content)
     
-    def put(self, request, format=None):
-        content = {
-            'status': 'user is authenticated'
-        }
-        return Response(content)
+    # def put(self, request, format=None):
+    #     content = {
+    #         'status': 'user is authenticated'
+    #     }
+    #     return Response(content)
 
 @api_view(['GET', 'POST','DELETE'])
 @permission_classes((IsAuthenticatedOrPOSTOnly,))
