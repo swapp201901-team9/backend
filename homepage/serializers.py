@@ -237,7 +237,7 @@ class GroupDesignSerializer(serializers.ModelSerializer):
         return self.user in obj.who.all()
 
     def get_comments(self, obj):
-        c_set = Comment.objects.all().filter(design=obj).order_by('created_at').reverse()
+        c_set = Comment.objects.all().filter(design=obj).order_by('created_at')
         return CommentSerializer(c_set, user=self.user, many=True).data
     
     class Meta:
