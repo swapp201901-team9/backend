@@ -28,6 +28,12 @@ class AuthList(APIView):
             'status': 'user is authenticated'
         }
         return Response(content)
+    
+    def put(self, request, format=None):
+        content = {
+            'status': 'user is authenticated'
+        }
+        return Response(content)
 
 @api_view(['GET', 'POST','DELETE'])
 @permission_classes((IsAuthenticatedOrPOSTOnly,))
@@ -48,6 +54,8 @@ def user_list(request):
                 return Response(status = status.HTTP_400_BAD_REQUEST)
         except KeyError:
             return Response(status = status.HTTP_400_BAD_REQUEST)
+        if username == "dummy_user":
+            return Response(status = status.HTTP_405_METHOD_NOT_ALLOWED)
         try: # if there is an user that has same username, return 405
             old_user = User.objects.get(username=username)
             return Response(status = status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -409,7 +417,7 @@ def copy_text_and_logo(post_design, design):
 
 @csrf_exempt
 @api_view(['GET', 'PUT', 'DELETE'])
-@permission_classes((IsAuthenticatedOrGETDELETEOnly,))
+@permission_classes((NoAuthenticationRequired,))
 def main(request):    
     if request.method == 'GET':
         # check if user is logged in
@@ -438,26 +446,52 @@ def main(request):
     
     # saves design to user group
     if request.method == 'PUT':
-        try:
-            user = Profile.objects.get(user=request.user)
-        except Profile.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)    
+        if request.user.id == None:
+            try:
+                dummy_user = User.objects.get(username="dummy_user")
+            except User.DoesNotExist:
+                dummy_user = User.objects.create_user("dummy_user", password="password")
+                dummy_user.save()
+            try:
+                dummy_profile = Profile.objects.get(user=dummy_user)
+            except Profile.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)    
+            data = json.loads(request.body.decode("utf-8")) 
+            design = Design()
+            design.owner = dummy_user
+            design.group = dummy_profile.user_group
+            design.name = ""
+            design.body=data['design']['body']
+            design.sleeve=data['design']['sleeve']
+            design.button=data['design']['button']
+            design.banding=data['design']['banding']
+            design.stripe=data['design']['stripe']
+            update_text_and_logo(data['text'], data['logo'], design)
+            design.front_image_url=data['image']['frontImg']
+            design.back_image_url=data['image']['backImg']
+            design.save()
+            design_serializer = UserDesignSerializer(design)
+        else:
+            try:
+                user = Profile.objects.get(user=request.user)
+            except Profile.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)    
 
-        data = json.loads(request.body.decode("utf-8")) 
-        design_id=data['id']
-        if design_id != user.recent.id:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        user.recent.name=data['name']
-        user.recent.body=data['design']['body']
-        user.recent.sleeve=data['design']['sleeve']
-        user.recent.button=data['design']['button']
-        user.recent.banding=data['design']['banding']
-        user.recent.stripe=data['design']['stripe']
-        update_text_and_logo(data['text'], data['logo'], user.recent)
-        user.recent.front_image_url=data['image']['frontImg']
-        user.recent.back_image_url=data['image']['backImg']
-        user.recent.save()
-        design_serializer = UserDesignSerializer(user.recent)
+            data = json.loads(request.body.decode("utf-8")) 
+            design_id=data['id']
+            if design_id != user.recent.id:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            user.recent.name=data['name']
+            user.recent.body=data['design']['body']
+            user.recent.sleeve=data['design']['sleeve']
+            user.recent.button=data['design']['button']
+            user.recent.banding=data['design']['banding']
+            user.recent.stripe=data['design']['stripe']
+            update_text_and_logo(data['text'], data['logo'], user.recent)
+            user.recent.front_image_url=data['image']['frontImg']
+            user.recent.back_image_url=data['image']['backImg']
+            user.recent.save()
+            design_serializer = UserDesignSerializer(user.recent)
         return Response(design_serializer.data)
 
     # doesn't really delete design but saves it in user group
